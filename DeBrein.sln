@@ -13,7 +13,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TCPServer", "TCPServer\TCPS
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DeBreinOrtho", "DeBreinOrtho\DeBreinOrtho.csproj", "{C4516BA1-2F03-4083-AF5B-188BB023BB15}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeBreinNametable", "DeBreinNametable\DeBreinNametable.csproj", "{D0DBC4CE-D98A-4E32-B30F-891AC1623C03}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DeBreinNametable", "DeBreinNametable\DeBreinNametable.csproj", "{D0DBC4CE-D98A-4E32-B30F-891AC1623C03}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeBruijnOrtho", "DeBruijnOrtho\DeBruijnOrtho.csproj", "{0C9D1B81-1E35-4AC8-B246-9E61DCEFFA4B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +47,10 @@ Global
 		{D0DBC4CE-D98A-4E32-B30F-891AC1623C03}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D0DBC4CE-D98A-4E32-B30F-891AC1623C03}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D0DBC4CE-D98A-4E32-B30F-891AC1623C03}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0C9D1B81-1E35-4AC8-B246-9E61DCEFFA4B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0C9D1B81-1E35-4AC8-B246-9E61DCEFFA4B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0C9D1B81-1E35-4AC8-B246-9E61DCEFFA4B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0C9D1B81-1E35-4AC8-B246-9E61DCEFFA4B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
