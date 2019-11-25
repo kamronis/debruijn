@@ -1,0 +1,41 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v3.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v3.0": {
+      "DeBreinOrtho/1.0.0": {
+        "dependencies": {
+          "Polar.DB": "1.0.6"
+        },
+        "runtime": {
+          "DeBreinOrtho.dll": {}
+        }
+      },
+      "Polar.DB/1.0.6": {
+        "runtime": {
+          "lib/netstandard2.0/Polar.DB.dll": {
+            "assemblyVersion": "1.0.6.0",
+            "fileVersion": "1.0.6.0"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "DeBreinOrtho/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Polar.DB/1.0.6": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-dQr/p+e8vWUR+CpnVWAJ70b0HTbdOFKrpobowt4/v4NpyFR8wAHEtjtuzCG/HedMRN30y6merVH2EmJdhNBRTw==",
+      "path": "polar.db/1.0.6",
+      "hashPath": "polar.db.1.0.6.nupkg.sha512"
+    }
+  }
+}

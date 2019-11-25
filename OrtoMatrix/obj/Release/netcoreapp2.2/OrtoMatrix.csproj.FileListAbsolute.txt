@@ -1,0 +1,11 @@
+D:\Home\dev2019\experiments\DeBrein\OrtoMatrix\bin\Release\netcoreapp2.2\OrtoMatrix.deps.json
+D:\Home\dev2019\experiments\DeBrein\OrtoMatrix\bin\Release\netcoreapp2.2\OrtoMatrix.runtimeconfig.json
+D:\Home\dev2019\experiments\DeBrein\OrtoMatrix\bin\Release\netcoreapp2.2\OrtoMatrix.runtimeconfig.dev.json
+D:\Home\dev2019\experiments\DeBrein\OrtoMatrix\bin\Release\netcoreapp2.2\OrtoMatrix.dll
+D:\Home\dev2019\experiments\DeBrein\OrtoMatrix\bin\Release\netcoreapp2.2\OrtoMatrix.pdb
+D:\Home\dev2019\experiments\DeBrein\OrtoMatrix\obj\Release\netcoreapp2.2\OrtoMatrix.csproj.CoreCompileInputs.cache
+D:\Home\dev2019\experiments\DeBrein\OrtoMatrix\obj\Release\netcoreapp2.2\OrtoMatrix.AssemblyInfoInputs.cache
+D:\Home\dev2019\experiments\DeBrein\OrtoMatrix\obj\Release\netcoreapp2.2\OrtoMatrix.AssemblyInfo.cs
+D:\Home\dev2019\experiments\DeBrein\OrtoMatrix\obj\Release\netcoreapp2.2\OrtoMatrix.dll
+D:\Home\dev2019\experiments\DeBrein\OrtoMatrix\obj\Release\netcoreapp2.2\OrtoMatrix.pdb
+D:\Home\dev2019\experiments\DeBrein\OrtoMatrix\obj\Release\netcoreapp2.2\OrtoMatrix.csprojAssemblyReference.cache

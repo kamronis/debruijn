@@ -1,0 +1,14 @@
+D:\Home\dev2019\experiments\DeBrein\DeBreinNametable\bin\Release\netcoreapp3.0\DeBreinNametable.exe
+D:\Home\dev2019\experiments\DeBrein\DeBreinNametable\bin\Release\netcoreapp3.0\DeBreinNametable.deps.json
+D:\Home\dev2019\experiments\DeBrein\DeBreinNametable\bin\Release\netcoreapp3.0\DeBreinNametable.runtimeconfig.json
+D:\Home\dev2019\experiments\DeBrein\DeBreinNametable\bin\Release\netcoreapp3.0\DeBreinNametable.runtimeconfig.dev.json
+D:\Home\dev2019\experiments\DeBrein\DeBreinNametable\bin\Release\netcoreapp3.0\DeBreinNametable.dll
+D:\Home\dev2019\experiments\DeBrein\DeBreinNametable\bin\Release\netcoreapp3.0\DeBreinNametable.pdb
+D:\Home\dev2019\experiments\DeBrein\DeBreinNametable\obj\Release\netcoreapp3.0\DeBreinNametable.csprojAssemblyReference.cache
+D:\Home\dev2019\experiments\DeBrein\DeBreinNametable\obj\Release\netcoreapp3.0\DeBreinNametable.AssemblyInfoInputs.cache
+D:\Home\dev2019\experiments\DeBrein\DeBreinNametable\obj\Release\netcoreapp3.0\DeBreinNametable.AssemblyInfo.cs
+D:\Home\dev2019\experiments\DeBrein\DeBreinNametable\obj\Release\netcoreapp3.0\DeBreinNametable.dll
+D:\Home\dev2019\experiments\DeBrein\DeBreinNametable\obj\Release\netcoreapp3.0\DeBreinNametable.pdb
+D:\Home\dev2019\experiments\DeBrein\DeBreinNametable\bin\Release\netcoreapp3.0\Polar.DB.dll
+D:\Home\dev2019\experiments\DeBrein\DeBreinNametable\bin\Release\netcoreapp3.0\Polar.TripleStore.dll
+D:\Home\dev2019\experiments\DeBrein\DeBreinNametable\obj\Release\netcoreapp3.0\DeBreinNametable.csproj.CopyComplete

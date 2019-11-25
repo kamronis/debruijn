@@ -1,0 +1,6 @@
+﻿Ссылки на ститьи по работе с графом de Bruijn
+
+http://cab.spbu.ru/software/spades/
+http://cab.spbu.ru/files/release3.13.1/manual.html#sec4.1
+https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3342519/
+https://arxiv.org/pdf/1211.2756v1.pdf
