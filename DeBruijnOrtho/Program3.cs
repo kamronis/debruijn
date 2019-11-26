@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace DeBruijnNametable
+namespace DeBruijn
 {
     partial class Program
     {

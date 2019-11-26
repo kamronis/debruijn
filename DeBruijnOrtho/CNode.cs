@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace DeBruijnNametable
+namespace DeBruijn
 {
     public struct CNode
     {

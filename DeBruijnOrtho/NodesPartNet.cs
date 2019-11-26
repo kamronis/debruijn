@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace DeBruijnNametable
+namespace DeBruijn
 {
     // Переходник к удаленной части
     public class NodesPartNet : INodePart
@@ -57,18 +57,18 @@ namespace DeBruijnNametable
         {
             bclient.BWriter.Write((byte)6);
         }
-        public void SetNodePrev(int node, int prevlink) // 7
+        public void SetNodePrev(int local, int prevlink) // 7
         {
             bclient.BWriter.Write((byte)7);
-            bclient.BWriter.Write(node);
+            bclient.BWriter.Write(local);
             bclient.BWriter.Write(prevlink);
             //byte r = bclient.BReader.ReadByte();
             //if (r != 77) throw new Exception("Error 77: r=" + r);
         }
-        public void SetNodeNext(int node, int nextlink) // 8
+        public void SetNodeNext(int local, int nextlink) // 8
         {
             bclient.BWriter.Write((byte)8);
-            bclient.BWriter.Write(node);
+            bclient.BWriter.Write(local);
             bclient.BWriter.Write(nextlink);
             //byte r = bclient.BReader.ReadByte();
             //if (r != 78) throw new Exception("Error 78: r=" + r);

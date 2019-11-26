@@ -4,7 +4,7 @@ using System.Linq;
 using System.IO;
 using System.Text;
 
-namespace DeBruijnNametable
+namespace DeBruijn
 {
     public interface INodePart
     {
@@ -20,8 +20,8 @@ namespace DeBruijnNametable
         IEnumerable<int> GetSetNodes(IEnumerable<UInt64> bwords);
         void MakePrototype();
 
-        void SetNodePrev(int node, int prevlink);
-        void SetNodeNext(int node, int nextlink);
+        void SetNodePrev(int local, int prevlink);
+        void SetNodeNext(int local, int nextlink);
 
         IEnumerable<CNode> GetNodes(IEnumerable<int> codes);
     }
@@ -111,9 +111,9 @@ namespace DeBruijnNametable
         
         public void DropDictionary() { dic = new Dictionary<ulong, int>(); }
 
-        public void SetNodePrev(int node, int prevlink)
+        public void SetNodePrev(int local, int prevlink)
         {
-            int node_nom = node >> Options.nshift;
+            int node_nom = local;
             var dnode = local_nodes[node_nom];
             if (dnode.prev == -1) { dnode.prev = prevlink; }
             else if (dnode.prev == prevlink) { }
@@ -121,9 +121,9 @@ namespace DeBruijnNametable
             else { dnode.prev = -2; }
             local_nodes[node_nom] = dnode;
         }
-        public void SetNodeNext(int node, int nextlink)
+        public void SetNodeNext(int local, int nextlink)
         {
-            int node_nom = node >> Options.nshift;
+            int node_nom = local;
             var dnode = local_nodes[node_nom];
             if (dnode.next == -1) { dnode.next = nextlink; }
             else if (dnode.next == nextlink) { }

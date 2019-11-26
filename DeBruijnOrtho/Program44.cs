@@ -4,7 +4,7 @@ using System.Linq;
 using System.IO;
 using System.Text;
 
-namespace DeBruijnNametable
+namespace DeBruijn
 {
     partial class Program
     {
@@ -37,9 +37,8 @@ namespace DeBruijnNametable
 
             // Кодирование узлов будем производить в несколько проходов (слоев). Выделим несколько битов в bword и на каждом 
             // проходе будем сравнивать с номером прохода (слоя)
-            int nlays = 4;
             int lay;
-            for (lay = 0; lay < nlays; lay++)
+            for (lay = 0; lay < Options.npasses; lay++)
             {
                 // Перемотаем на начало бинарный рид 
                 breadstream.Position = 0L;
@@ -49,7 +48,7 @@ namespace DeBruijnNametable
                 BinaryWriter binw = new BinaryWriter(fileout);
                 filein.Position = 0L; fileout.Position = 0L;
 
-                ActionBuffer group = new ActionBuffer(1000, objs =>
+                ActionBuffer group = new ActionBuffer(Options.bwordsbuffer, objs =>
                 {
                     object[] elements = objs.ToArray();
 
@@ -117,7 +116,7 @@ namespace DeBruijnNametable
                         UInt64 bword = br.ReadUInt64();
                         int code = -4;
                         if (lay > 0) code = binr.ReadInt32();
-                        if (((bword >> Options.nshift) & (ulong)(nlays - 1)) == (ulong)lay)
+                        if (((bword >> Options.nshift) & (ulong)(Options.npasses - 1)) == (ulong)lay)
                         {
                             //code = graph.GetSetNode(bword);
                             //binw.Write(code);

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace DeBruijnNametable
+namespace DeBruijn
 {
     partial class Program
     {
@@ -11,33 +11,42 @@ namespace DeBruijnNametable
         /// <summary>
         /// Работает в режиме master и client, если аргументов нет, то запускается мастер без сети, если нулевой аргумент - число,
         /// то это мастер, число означает количество клиентов, которое должно быть запущено позже,
-        /// клиенту нулевым аргументом запуска передается IP-адрес мастера 
+        /// клиенту нулевым аргументом запуска передается IP-адрес мастера или слово client 
         /// </summary>
         /// <param name="args"></param>
         public static void Main(string[] args)
         {
             if (args.Length == 0)
             {
-                MainMaster(1);
+                MainMaster(0);
                 //MainClient(new string[] { "127.0.0.1" });
             }
             else
             {
                 int nclients;
                 if (Int32.TryParse(args[0], out nclients)) MainMaster(nclients);
-                else MainClient(args);
+                else if (args[0] == "client") MainClient();
+                else throw new Exception("Error: wrong Main args");
             }
         }
-        static string host = "127.0.0.1";
-        static int port = 8788;
         public static void MainMaster(int nclients)
         {
             Console.WriteLine($"Start MainMaster {nclients}");
+            
+            // Зафиксируем и вычислим некоторые параметры
+            Options.nparts = nclients + 1;
+            Options.nslaves = nclients;
+            
+            int mask = Options.nparts - 1;
+            Options.nshift = 0;
+            while (mask != 0) { mask >>= 1; Options.nshift++; }
+
+
             // Сначала создадим сетевую конфигурацию
             ServerConnection sc = null;
             if (nclients > 0)
             {
-                sc = new ServerConnection(host, port);
+                sc = new ServerConnection(Options.host, Options.port);
                 sc.Start(nclients); 
             }
 
@@ -67,15 +76,14 @@ namespace DeBruijnNametable
             {
                 foreach (var c in sc.clients) { c.BWriter.Write((byte)255); }
                 sc.Release();
-                //sc.clients[0].BWriter.Write((byte)255);
             }
         }
-        public static void MainClient(string[] args) 
+        public static void MainClient() 
         {
-            Console.WriteLine($"Start MainClient {args[0]}");
+            Console.WriteLine($"Start MainClient for {Options.host}");
             NodesPart storage = new NodesPart(Options.clientlistfilename);
             //storage.Init();
-            ClientConnection connection = new ClientConnection(host, port, storage);
+            ClientConnection connection = new ClientConnection(Options.host, Options.port, storage);
             while (true) 
             {
                 bool ok = connection.ReceiveAndExecuteCommand();

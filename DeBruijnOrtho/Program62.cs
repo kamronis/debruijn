@@ -4,7 +4,7 @@ using System.Linq;
 using System.IO;
 using System.Text;
 
-namespace DeBruijnNametable
+namespace DeBruijn
 {
     partial class Program
     {
@@ -21,7 +21,6 @@ namespace DeBruijnNametable
 
             // Обработка графа. Извлечение цепочек
 
-            int bufflength = 1000;
             int nchains = 0;
             CNode[] maxlist = new CNode[0];
 
@@ -42,7 +41,7 @@ namespace DeBruijnNametable
 
                     if (n % 1_000_000 == 0) Console.Write($"{n / 1_000_000} ");
                     codes.Add(graph.ConstructCode(ipart, n));
-                    if (codes.Count >= bufflength)
+                    if (codes.Count >= Options.buffcnodeslength)
                     {
                         CNode[] nodes = graph.GetNodes(codes).ToArray();
                         var nset1 = nodes

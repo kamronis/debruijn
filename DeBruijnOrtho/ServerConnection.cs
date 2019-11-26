@@ -5,7 +5,7 @@ using System.Text;
 using System.Net;
 using System.Net.Sockets;
 
-namespace DeBruijnNametable
+namespace DeBruijn
 {
     public class ServerConnection
     {
@@ -62,7 +62,7 @@ namespace DeBruijnNametable
         {
             this.client = client;
             //stream = client.GetStream();
-            stream = new BufferedStream(client.GetStream());
+            stream = new BufferedStream(client.GetStream(), Options.bufferSize);
             br = new BinaryReader(stream);
             bw = new BinaryWriter(stream);
         }

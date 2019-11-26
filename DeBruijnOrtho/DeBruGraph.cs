@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace DeBruijnNametable
+namespace DeBruijn
 {
     public class DeBruGraph
     {
@@ -28,10 +28,6 @@ namespace DeBruijnNametable
                 parts[0] = new NodesPart(Options.masterlistfilename);
                 for (int i = 1; i < Options.nparts; i++) parts[i] = new NodesPartNet(sconnection.clients[i - 1]);
             }
-
-            int mask = Options.nparts - 1;
-            Options.nshift = 0;
-            while (mask != 0) { mask >>= 1; Options.nshift++; }
 
             foreach (var part in parts) { part.Init(); }
         }
