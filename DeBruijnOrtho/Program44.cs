@@ -40,6 +40,7 @@ namespace DeBruijn
             int lay;
             for (lay = 0; lay < Options.npasses; lay++)
             {
+                Console.Write($"pass {lay} ");
                 // Перемотаем на начало бинарный рид 
                 breadstream.Position = 0L;
                 // инициализируем входной и выходной стримы
@@ -103,6 +104,7 @@ namespace DeBruijn
 
                 for (long ind = 0; ind < nreeds; ind++)
                 {
+                    if (ind % 10_000 == 0) Console.Write($"{ind / 10_000} ");
                     // читаем и пишем длину бинарного рида
                     int nwords = (int)br.ReadInt64();
                     if (lay > 0) binr.ReadInt64();
@@ -134,6 +136,7 @@ namespace DeBruijn
                 // Пошлем команду на освобождение словаря
                 graph.DropDictionary();
                 GC.Collect();
+                Console.WriteLine();
             }
             fs0.Close(); fs1.Close();
             string lastfname = (lay & 1) == 0 ? tmp0 : tmp1;

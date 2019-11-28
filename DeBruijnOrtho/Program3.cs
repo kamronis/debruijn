@@ -28,6 +28,7 @@ namespace DeBruijn
             while ((line = treader.ReadLine()) != null)
             {
                 //if (nreeds > 50000) break; /////////////////  ОТЛАДКА!
+                if (nreeds % 100_000 == 0) Console.Write($"{nreeds / 100_000} ");
                 nreeds++;
                 // Записываем длину бинарного рида
                 int nwords = line.Length - nsymbols + 1;
@@ -40,6 +41,7 @@ namespace DeBruijn
                     bw.Write(cword);
                 }
             }
+            Console.WriteLine();
             // Записываем получившееся количество ридов, сбрасываем буфера
             tmpbinstream.Position = 0L;
             bw.Write(nreeds);

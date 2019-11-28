@@ -18,14 +18,14 @@ namespace DeBruijn
         {
             if (args.Length == 0)
             {
-                MainMaster(0);
-                //MainClient(new string[] { "127.0.0.1" });
+                //MainMaster(0);
+                MainClient(new string[] { "client n2.bin" });
             }
             else
             {
                 int nclients;
                 if (Int32.TryParse(args[0], out nclients)) MainMaster(nclients);
-                else if (args[0] == "client") MainClient();
+                else if (args[0] == "client") MainClient(args);
                 else throw new Exception("Error: wrong Main args");
             }
         }
@@ -78,9 +78,11 @@ namespace DeBruijn
                 sc.Release();
             }
         }
-        public static void MainClient() 
+        public static void MainClient(string[] args) 
         {
             Console.WriteLine($"Start MainClient for {Options.host}");
+            string fname = Options.clientlistfilename;
+            if (args.Length > 1) fname = args[1];
             NodesPart storage = new NodesPart(Options.clientlistfilename);
             //storage.Init();
             ClientConnection connection = new ClientConnection(Options.host, Options.port, storage);

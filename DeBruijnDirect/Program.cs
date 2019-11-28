@@ -47,13 +47,14 @@ namespace DeBruijnDirect
                         // Переводим слово в бинарный вид
                         ulong bword = Combine(word);
                         // находим или создаем текущий узел
-                        int code = ccodes.Count;
+                        int code;
                         if (dic.TryGetValue(bword, out code)) { }
                         else
                         {
+                            code = nnodes;
                             ccodes.Add(bword);
-                            nnodes++;
                             dic.Add(bword, code);
+                            nnodes++;
                         }
                         reed[i] = code;
                     }
@@ -66,11 +67,10 @@ namespace DeBruijnDirect
                 GC.Collect();
             }
 
-            sw.Stop();
-            Console.WriteLine($"duration={sw.ElapsedMilliseconds}");
 
             // Теперь нам нужны узлы со ссылками (номерами) prev и next
             PrevNext[] lnodes = new PrevNext[nnodes];
+            for (int i=0; i<nnodes; i++) { lnodes[i].prev = -1; lnodes[i].next = -1; }
 
             // Сканируем новые кодированные риды
             foreach (var cread in creads)
@@ -102,9 +102,55 @@ namespace DeBruijnDirect
                 // Основная идея в том, что цепочка может начинаться ТОЛЬКО с узла у которого нет предыдущего или 
                 // предыдущих несколько или предыдущий один, но у него несколько следующих.
                 // Кроме того, нет смысла рассматривать те узлы, у которых не единственный следующий.
-                
-                // Критерии непринятия: ссылка назад  должна быть меньше нуля
+
+                var node = lnodes[n];
+                // Критерии принятия: (ссылка назад меньше нуля или ссылка назад есть но у того узла ссылки вперед нет) и есть ссылка вперед
+                if ((node.prev < 0 || lnodes[node.prev].next < 0) && node.next >= 0)
+                { startpoints.Add(node); } // принято
+                else // не принято
+                { }
             }
+            Console.WriteLine($"# startpoins: {startpoints.Count}");
+
+            // Отслеживаем цепочки
+            List<PrevNext> maxchain = new List<PrevNext>();
+            foreach (var spoint in startpoints)
+            {
+                PrevNext ndd = spoint;
+                // добавлен начальный узел, у которого есть следующий
+                List<PrevNext> chain = new List<PrevNext>(new PrevNext[] { ndd });
+                while (true)
+                {
+                    PrevNext ndd_candidate = lnodes[ndd.next];
+                    // Если кандидат не имеет предыдущего, то цепочка закончилась
+                    if (ndd_candidate.prev < 0) break;
+                    // Если кандидат не имеет следующего, то включить в цепочку и выйти
+                    if (ndd_candidate.next < 0)
+                    {
+                        chain.Add(ndd_candidate);
+                        break;
+                    }
+                    // Просто включить в цепочку
+                    chain.Add(ndd_candidate);
+                    ndd = ndd_candidate;
+                }
+                if (chain.Count > maxchain.Count) maxchain = chain;
+            }
+            Console.WriteLine($"maxchain: {maxchain.Count}");
+
+            sw.Stop();
+            Console.WriteLine($"duration={sw.ElapsedMilliseconds}");
+
+            // Выдача максимальной цепочки
+            Console.Write(UnCombine(ccodes[maxchain[1].prev], nsymbols));
+            for (int i = 0; i < maxchain.Count - 1; i++)
+            {
+                int code = maxchain[i].next;
+                var word = ccodes[code];
+                string sword = UnCombine(word, nsymbols);
+                Console.Write(sword[sword.Length - 1]);
+            }
+            Console.WriteLine();
 
         }
 

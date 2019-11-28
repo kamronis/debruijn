@@ -6,8 +6,10 @@ namespace DeBruijn
 {
     class Options
     {
-        public static string masterfileplace = @"D:\Home\data\deBrein\";
-        public static string clientfileplace = @"D:\Home\data\deBrein\";
+        //public static string masterfileplace = @"D:\Home\data\deBrein\";
+        //public static string clientfileplace = @"D:\Home\data\deBrein\";
+        public static string masterfileplace = @"C:\data\deBruijn\";
+        public static string clientfileplace = @"C:\data\deBruijn\";
         public static string readsfilename = masterfileplace + "reads.txt";
         public static string breadsfilename = masterfileplace + "breads.bin";
         public static string creadsfilename = masterfileplace + "creads.bin";
