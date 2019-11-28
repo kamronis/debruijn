@@ -15,6 +15,7 @@ namespace DeBruijnDirect
             // Есть рабочие данные и есть маленький файл с графом деБрейна
             string readsfilename = @"D:\Home\data\deBrein\reads.txt";
             int nsymbols = 20;
+            int npasses = 2;
 
             sw.Start(); // запускаем секундомер
 
@@ -24,21 +25,35 @@ namespace DeBruijnDirect
             Dictionary<ulong, int> dic = new Dictionary<ulong, int>();
             int nnodes = 0;
 
+            FileStream fs = File.Open(readsfilename, FileMode.Open, FileAccess.Read);
+            TextReader reader = new StreamReader(fs);
+
             // Сканируем данные, вычисляем узлы
-            using (TextReader reader = new StreamReader(File.Open(readsfilename, FileMode.Open, FileAccess.Read)))
+            for (int ipass = 0; ipass < npasses; ipass++)
             {
-                string line = null;
+                string line;
                 int lcount = 0;
                 int nwords = 0;
+                fs.Position = 0L;
+                //for (int iline = 0; iline < lines.Count; iline++)
                 while ((line = reader.ReadLine()) != null)
                 {
+                    //line = lines[iline];
                     int len = line.Length;
-                    lcount++;
-                    
+
                     // создадим или прочитаем кодированный рид
-                    int[] reed = new int[len - nsymbols + 1];
-                    creads.Add(reed);
-                    
+                    int[] reed = null;
+                    if (ipass == 0)
+                    {
+                        reed = new int[len - nsymbols + 1];
+                        creads.Add(reed);
+                    }
+                    else
+                    {
+                        reed = creads[lcount];
+                    }
+                    lcount++;
+
                     for (int i = 0; i < len - nsymbols + 1; i++)
                     {
                         // формируем слово
@@ -47,26 +62,30 @@ namespace DeBruijnDirect
                         // Переводим слово в бинарный вид
                         ulong bword = Combine(word);
                         // находим или создаем текущий узел
-                        int code;
-                        if (dic.TryGetValue(bword, out code)) { }
-                        else
+                        if ((int)(bword & (ulong)(npasses-1)) == ipass)
                         {
-                            code = nnodes;
-                            ccodes.Add(bword);
-                            dic.Add(bword, code);
-                            nnodes++;
+                            int code;
+                            if (dic.TryGetValue(bword, out code)) { }
+                            else
+                            {
+                                code = nnodes;
+                                //ccodes.Add(bword);
+                                dic.Add(bword, code);
+                                nnodes++;
+                            }
+                            reed[i] = code;
                         }
-                        reed[i] = code;
                     }
-
                 }
-                Console.WriteLine($"memory used after dictionaries: {GC.GetTotalMemory(false)}");
-                Console.WriteLine($"lines:{lcount} words: {nwords} codes: {ccodes.Count}");
+                if (ipass == npasses - 1)
+                {
+                    Console.WriteLine($"memory used after dictionaries: {GC.GetTotalMemory(false)}");
+                    Console.WriteLine($"lines:{lcount} words: {nwords} codes: {nnodes}");
+                }
                 // Теперь нам словарь не поднадобится
                 dic = new Dictionary<ulong, int>();
                 GC.Collect();
             }
-
 
             // Теперь нам нужны узлы со ссылками (номерами) prev и next
             PrevNext[] lnodes = new PrevNext[nnodes];
@@ -93,7 +112,6 @@ namespace DeBruijnDirect
                     previous = current;
                 }
             }
-            Console.WriteLine($"memory used after graph building: {GC.GetTotalMemory(false)}");
 
             // Находим начала цепочек
             List<PrevNext> startpoints = new List<PrevNext>();
@@ -138,19 +156,19 @@ namespace DeBruijnDirect
             }
             Console.WriteLine($"maxchain: {maxchain.Count}");
 
+            //// Выдача максимальной цепочки
+            //Console.Write(UnCombine(ccodes[maxchain[1].prev], nsymbols));
+            //for (int i = 0; i < maxchain.Count - 1; i++)
+            //{
+            //    int code = maxchain[i].next;
+            //    var word = ccodes[code];
+            //    string sword = UnCombine(word, nsymbols);
+            //    Console.Write(sword[sword.Length - 1]);
+            //}
+            //Console.WriteLine();
+            
             sw.Stop();
-            Console.WriteLine($"duration={sw.ElapsedMilliseconds}");
-
-            // Выдача максимальной цепочки
-            Console.Write(UnCombine(ccodes[maxchain[1].prev], nsymbols));
-            for (int i = 0; i < maxchain.Count - 1; i++)
-            {
-                int code = maxchain[i].next;
-                var word = ccodes[code];
-                string sword = UnCombine(word, nsymbols);
-                Console.Write(sword[sword.Length - 1]);
-            }
-            Console.WriteLine();
+            Console.WriteLine($"total duration={sw.ElapsedMilliseconds}");
 
         }
 
