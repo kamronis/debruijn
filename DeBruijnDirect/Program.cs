@@ -80,7 +80,7 @@ namespace DeBruijnDirect
                 if (ipass == npasses - 1)
                 {
                     Console.WriteLine($"memory used after dictionaries: {GC.GetTotalMemory(false)}");
-                    Console.WriteLine($"lines:{lcount} words: {nwords} codes: {nnodes}");
+                    Console.WriteLine($"lines:{lcount} words: {nwords} codes: {nnodes} dictionary : {dic.Count} elements");
                 }
                 // Теперь нам словарь не поднадобится
                 dic = new Dictionary<ulong, int>();
