@@ -57,7 +57,7 @@ namespace DeBruijn
             else if (comm == 3) { storage.MakePrototype(); }
             else if (comm == 4) { storage.Close(); }
             else if (comm == 5) { var cnt = storage.Count(); bw.Write(cnt); }
-            else if (comm == 6) { storage.Restore(); }
+            //else if (comm == 6) { storage.Restore(); }
             else if (comm == 7)
             {
                 int node = br.ReadInt32();
@@ -76,10 +76,9 @@ namespace DeBruijn
             else if (comm == 10)
             {
                 int nom = br.ReadInt32();
-                CNode cnode = storage.GetNodeLocal(nom);
-                bw.Write(cnode.bword);
-                bw.Write(cnode.prev);
-                bw.Write(cnode.next);
+                LNode lnode = storage.GetLNodeLocal(nom);
+                bw.Write(lnode.prev);
+                bw.Write(lnode.next);
             }
             else if (comm == 11)
             {
@@ -89,18 +88,23 @@ namespace DeBruijn
                 {
                     codes[i] = br.ReadInt32();
                 }
-                CNode[] resu = storage.GetNodes(codes).ToArray();
+                LNode[] resu = storage.GetNodes(codes).ToArray();
                 if (resu.Length != codes.Length) throw new Exception("229848");
                 bw.Write((long)resu.Length);
                 for (int i = 0; i < nargs; i++)
                 {
-                    CNode cnode = resu[i];
-                    bw.Write(cnode.bword);
+                    LNode cnode = resu[i];
+                    //bw.Write(cnode.bword);
                     bw.Write(cnode.prev);
                     bw.Write(cnode.next);
                 }
             }
             else if (comm == 12) { storage.Init(); }
+            else if (comm == 14) { storage.RestoreWNodes(); }
+            else if (comm == 15) { storage.RestoreInitLNodes(); }
+            else if (comm == 16) { storage.RestoreDeactivateWNodes(); }
+            else if (comm == 17) { storage.RestoreLNodes(); }
+
             else throw new Exception("Err: comm=" + comm);
             return true;
         }

@@ -13,7 +13,7 @@ namespace DeBruijnDirect
 
             // Данные читаются из файла, "слово" в n-граммном разбиении имеет длину nsymbols. 
             // Есть рабочие данные и есть маленький файл с графом деБрейна
-            string readsfilename = @"D:\Home\data\deBrein\reads.txt";
+            string readsfilename = @"D:\Home\data\deBruijn\reads.txt";
             int nsymbols = 20;
             int npasses = 2;
 

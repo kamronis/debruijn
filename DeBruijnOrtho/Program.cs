@@ -18,8 +18,8 @@ namespace DeBruijn
         {
             if (args.Length == 0)
             {
-                //MainMaster(0);
-                MainClient(new string[] { "client n2.bin" });
+                MainMaster(0);
+                //MainClient(new string[] { "client n2.bin" });
             }
             else
             {
@@ -81,9 +81,7 @@ namespace DeBruijn
         public static void MainClient(string[] args) 
         {
             Console.WriteLine($"Start MainClient for {Options.host}");
-            string fname = Options.clientlistfilename;
-            if (args.Length > 1) fname = args[1];
-            NodesPart storage = new NodesPart(Options.clientlistfilename);
+            NodesPart storage = new NodesPart(Options.wnodesfilename_net, Options.lnodesfilename_net);
             //storage.Init();
             ClientConnection connection = new ClientConnection(Options.host, Options.port, storage);
             while (true) 

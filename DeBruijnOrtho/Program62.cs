@@ -17,12 +17,12 @@ namespace DeBruijn
             //NodesPart[] parts = new NodesPart[] { new NodesPart(options.nodelistfilename) };
             //foreach (var part in parts) part.Restore();
             graph.InitParts();
-            graph.Restore();
+            graph.Restore62();
 
             // Обработка графа. Извлечение цепочек
 
             int nchains = 0;
-            CNode[] maxlist = new CNode[0];
+            LNode[] maxlist = new LNode[0];
 
             // Цикл по всем частям и всем узлам
             for (int ipart = 0; ipart < Options.nparts; ipart++)
@@ -30,7 +30,7 @@ namespace DeBruijn
                 int nodescount = graph.PartNodesCount(ipart);
                 Console.WriteLine($"part {ipart}  #nodes {nodescount}");
                 // Поиск узлов начал цепочек
-                List<CNode> startpoints = new List<CNode>();
+                List<LNode> startpoints = new List<LNode>();
                 // Накопитель
                 List<int> codes = new List<int>();
                 for (int n = 0; n < nodescount; n++) // n - локальный код
@@ -43,7 +43,7 @@ namespace DeBruijn
                     codes.Add(graph.ConstructCode(ipart, n));
                     if (codes.Count >= Options.buffcnodeslength)
                     {
-                        CNode[] nodes = graph.GetNodes(codes).ToArray();
+                        LNode[] nodes = graph.GetNodes(codes).ToArray();
                         var nset1 = nodes
                             .Where(nd => nd.prev == -1 || nd.prev == -2);
                         var cset2 = nodes
@@ -57,7 +57,7 @@ namespace DeBruijn
                 }
                 if (codes.Count > 0)
                 {
-                    CNode[] nodes = graph.GetNodes(codes).ToArray();
+                    LNode[] nodes = graph.GetNodes(codes).ToArray();
                     var nset1 = nodes
                         .Where(nd => nd.prev == -1 || nd.prev == -2);
                     var cset2 = nodes
@@ -74,12 +74,12 @@ namespace DeBruijn
                 // Прохождение цепочек
 
                 int limit = 1000;
-                List<List<CNode>> chains = new List<List<CNode>>();
+                List<List<LNode>> chains = new List<List<LNode>>();
                 for (int ind = 0; ind < startpoints.Count; ind++)
                 {
-                    CNode nd = startpoints[ind];
+                    LNode nd = startpoints[ind];
                     // Добавляем еще одну цепочку если у узла есть следующий
-                    if (nd.next >= 0) chains.Add(new List<CNode>(new CNode[] { nd }));
+                    if (nd.next >= 0) chains.Add(new List<LNode>(new LNode[] { nd }));
                     // Возможны варианты: мало цепочек или много цепочек
                     // Будем удлинять и выбраковывать цепочки пока их не станет мало
                     while (chains.Count > limit || (ind == startpoints.Count - 1 && chains.Count > 0))
@@ -87,14 +87,14 @@ namespace DeBruijn
                         // текущий вектор кодов узлов
                         IEnumerable<int> next_codes = chains.Select(li => li[li.Count - 1].next);
                         // массив следующих узлов
-                        CNode[] next = graph.GetNodes(next_codes).ToArray();
+                        LNode[] next = graph.GetNodes(next_codes).ToArray();
                         // Выбраковывание и формирование нового списка
-                        List<List<CNode>> chains_next = new List<List<CNode>>();
+                        List<List<LNode>> chains_next = new List<List<LNode>>();
                         for (int i = 0; i < chains.Count; i++)
                         {
-                            List<CNode> chain = chains[i];
-                            CNode ndd = chain[chain.Count - 1];
-                            CNode nd_candidate = next[i];
+                            List<LNode> chain = chains[i];
+                            LNode ndd = chain[chain.Count - 1];
+                            LNode nd_candidate = next[i];
                             // последний элемент ndd цепочки обладает свойствами: ndd.next >= 0 (иначе нельзя удлинить)
 
                             // Кандидат может не подойти если nd_candidate.prev < 0. тогда выводим список из оборота
@@ -116,16 +116,16 @@ namespace DeBruijn
             }
             Console.WriteLine($"==== maxchain: {maxlist.Count()}");
 
-            // Выдача максимальной цепочки
-            Console.Write(DBNode.UnCombine(maxlist[0].bword, nsymbols));
-            for (int i = 1; i < maxlist.Length; i++)
-            {
-                CNode node = maxlist[i];
-                var word = node.bword;
-                string sword = DBNode.UnCombine(word, nsymbols);
-                Console.Write(sword[sword.Length - 1]);
-            }
-            Console.WriteLine();
+            //// Выдача максимальной цепочки
+            //Console.Write(DBNode.UnCombine(maxlist[0].bword, nsymbols));
+            //for (int i = 1; i < maxlist.Length; i++)
+            //{
+            //    CNode node = maxlist[i];
+            //    var word = node.bword;
+            //    string sword = DBNode.UnCombine(word, nsymbols);
+            //    Console.Write(sword[sword.Length - 1]);
+            //}
+            //Console.WriteLine();
 
 
             graph.Close();

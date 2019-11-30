@@ -25,15 +25,26 @@ namespace DeBruijn
             }
             else
             {
-                parts[0] = new NodesPart(Options.masterlistfilename);
+                parts[0] = new NodesPart(Options.wnodesfilename, Options.lnodesfilename);
                 for (int i = 1; i < Options.nparts; i++) parts[i] = new NodesPartNet(sconnection.clients[i - 1]);
             }
 
             foreach (var part in parts) { part.Init(); }
         }
-        public void Restore()
+        public void Restore51()
         {
-            foreach (var part in parts) { part.Restore(); }
+            // Восстанавливаем wnodes, инициируем lnodes, деактивируем wnodes
+            foreach (var part in parts) 
+            { 
+                part.RestoreWNodes(); //TODO: Читать все не нужно-БЫ!
+                part.RestoreInitLNodes();
+                part.RestoreDeactivateWNodes();
+            }
+        }
+        public void Restore62()
+        {
+            // Восстанавливаем lnodes
+            foreach (var part in parts) { part.RestoreLNodes(); }
         }
         public void Save()
         {
@@ -111,12 +122,12 @@ namespace DeBruijn
         {
             return parts[ipart].Count();
         }
-        internal CNode GetNode(int code)
+        internal LNode GetNode(int code)
         {
             int ipart = code & (Options.nparts - 1);
-            return parts[ipart].GetNodeLocal(code >> Options.nshift);
+            return parts[ipart].GetLNodeLocal(code >> Options.nshift);
         }
-        internal IEnumerable<CNode> GetNodes(IEnumerable<int> codes)
+        internal IEnumerable<LNode> GetNodes(IEnumerable<int> codes)
         {
             //return codes.Select(c => GetNode(c));
             int mask = (int)(Options.nparts - 1);
@@ -133,7 +144,7 @@ namespace DeBruijn
             }
 
             // Сделаем запросы к секциям
-            List<CNode>[] cnodesbysections = Enumerable.Repeat(1, Options.nparts).Select(i => new List<CNode>()).ToArray();
+            List<LNode>[] cnodesbysections = Enumerable.Repeat(1, Options.nparts).Select(i => new List<LNode>()).ToArray();
             for (int j = 0; j < Options.nparts; j++)
             {
                 cnodesbysections[j] = parts[j].GetNodes(codesbysections[j]).ToList();
@@ -141,13 +152,13 @@ namespace DeBruijn
 
             // Объединим результаты
             int[] nextind = Enumerable.Repeat(0, Options.nparts).ToArray();
-            CNode[] results = new CNode[arr.Length];
+            LNode[] results = new LNode[arr.Length];
             for (int i = 0; i < arr.Length; i++)
             {
                 int code = arr[i];
                 int ipart = (int)(code & mask);
-                CNode cnode = cnodesbysections[ipart][nextind[ipart]];
-                results[i] = cnode;
+                LNode lnode = cnodesbysections[ipart][nextind[ipart]];
+                results[i] = lnode;
                 nextind[ipart] += 1;
             }
             return results;
