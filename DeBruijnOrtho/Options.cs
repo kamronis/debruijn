@@ -6,21 +6,26 @@ namespace DeBruijn
 {
     class Options
     {
-        //public static string masterfileplace = @"D:\Home\data\deBrein\";
-        //public static string clientfileplace = @"D:\Home\data\deBrein\";
-        public static string masterfileplace = @"C:\data\deBruijn\";
-        public static string clientfileplace = @"C:\data\deBruijn\";
+        public static string masterfileplace = @"D:\Home\data\deBruijn\";
+        public static string clientfileplace = @"D:\Home\data\deBruijn\";
         public static string readsfilename = masterfileplace + "reads.txt";
         public static string breadsfilename = masterfileplace + "breads.bin";
         public static string creadsfilename = masterfileplace + "creads.bin";
-        public static string masterlistfilename = masterfileplace + "nlist.bin";
-        public static string clientlistfilename = clientfileplace + "nlist_net.bin";
+        //public static string masterlistfilename = masterfileplace + "nlist.bin";
+        //public static string clientlistfilename = clientfileplace + "nlist_net.bin";
+
+        public static string wnodesfilename = masterfileplace + "wnodes.bin";
+        public static string wnodesfilename_net = masterfileplace + "wnodes_net.bin";
+        public static string lnodesfilename = masterfileplace + "lnodes.bin";
+        public static string lnodesfilename_net = masterfileplace + "lnodes_net.bin";
+
+
         public static int nsymbols = 20;
 
         public static string host = "127.0.0.1"; // IP компьютера, на котором располагается мастер
         public static int port = 8788;
 
-        public static int npasses = 4; // Число проходов при кодировании слов (Program44)
+        public static int npasses = 2; // Число проходов при кодировании слов (Program44)
         public static int bwordsbuffer = 1000;
         public static int bufferSize = 2000; // Размер буферов на сетевых стримах
         public static int buffcnodeslength = 2000;

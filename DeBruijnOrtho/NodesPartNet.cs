@@ -79,17 +79,16 @@ namespace DeBruijn
             bclient.BWriter.Write((byte)9);
         }
 
-        public CNode GetNodeLocal(int nom) // 10
+        public LNode GetLNodeLocal(int nom) // 10
         {
             bclient.BWriter.Write((byte)10);
             bclient.BWriter.Write(nom);
-            UInt64 bword = bclient.BReader.ReadUInt64();
             int prev = bclient.BReader.ReadInt32();
             int next = bclient.BReader.ReadInt32();
-            return new CNode() { bword = bword, prev = prev, next = next };
+            return new LNode() { prev = prev, next = next };
         }
 
-        public IEnumerable<CNode> GetNodes(IEnumerable<int> codes) // 11
+        public IEnumerable<LNode> GetNodes(IEnumerable<int> codes) // 11
         {
             bclient.BWriter.Write((byte)11);
             int[] arr = codes.ToArray();
@@ -102,13 +101,13 @@ namespace DeBruijn
             // Принимаем
             int nres = (int)bclient.BReader.ReadInt64();
             if (nres != arr.Length) throw new Exception("2929333");
-            CNode[] carr = new CNode[nres];
+            LNode[] carr = new LNode[nres];
             for (int i = 0; i< nres; i++)
             {
-                UInt64 bword = bclient.BReader.ReadUInt64();
+                //UInt64 bword = bclient.BReader.ReadUInt64();
                 int prev = bclient.BReader.ReadInt32();
                 int next = bclient.BReader.ReadInt32();
-                carr[i] = new CNode() { bword = bword, prev = prev, next = next };
+                carr[i] = new LNode() { prev = prev, next = next };
             }
             return carr;
         }
@@ -122,5 +121,24 @@ namespace DeBruijn
             throw new NotImplementedException();
         }
 
+        public void RestoreWNodes() // 14
+        {
+            bclient.BWriter.Write((byte)14);
+        }
+
+        public void RestoreInitLNodes() // 15
+        {
+            bclient.BWriter.Write((byte)15);
+        }
+
+        public void RestoreDeactivateWNodes() // 16
+        {
+            bclient.BWriter.Write((byte)16);
+        }
+
+        public void RestoreLNodes() // 17
+        {
+            bclient.BWriter.Write((byte)17);
+        }
     }
 }

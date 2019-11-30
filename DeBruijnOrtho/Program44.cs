@@ -146,8 +146,8 @@ namespace DeBruijn
             if (File.Exists(tmp1)) File.Delete(tmp1);
 
             Console.WriteLine($"Memory used: {GC.GetTotalMemory(false)}");
-            graph.MakePrototype();
-
+            //graph.MakePrototype();
+            graph.Save();
             graph.Close();
 
             sw.Stop();

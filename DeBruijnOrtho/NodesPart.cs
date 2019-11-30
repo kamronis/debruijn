@@ -9,12 +9,15 @@ namespace DeBruijn
     public interface INodePart
     {
         void Init();
-        void Restore();
+        void RestoreWNodes();
+        void RestoreInitLNodes();
+        void RestoreDeactivateWNodes();
+        void RestoreLNodes();
         int Count();
         void Save();
         void Close();
         void DropDictionary();
-        CNode GetNodeLocal(int nom);
+        LNode GetLNodeLocal(int nom);
 
         int GetSetNode(UInt64 bword);
         IEnumerable<int> GetSetNodes(IEnumerable<UInt64> bwords);
@@ -23,35 +26,51 @@ namespace DeBruijn
         void SetNodePrev(int local, int prevlink);
         void SetNodeNext(int local, int nextlink);
 
-        IEnumerable<CNode> GetNodes(IEnumerable<int> codes);
+        IEnumerable<LNode> GetNodes(IEnumerable<int> codes);
     }
     public class NodesPart : INodePart
     {
-        private FileStream fs;
-        private BinaryReader br;
-        private BinaryWriter bw;
         private Dictionary<UInt64, int> dic = new Dictionary<ulong, int>();
-        private List<CNode> local_nodes = new List<CNode>();
-        private string nodepartfilename;
-        public NodesPart(string nodepartfilename)
+
+        private string wnodesfilename;
+        private FileStream fsw;
+        private BinaryReader brw;
+        private BinaryWriter bww;
+        private List<WNode> local_wnodes = new List<WNode>();
+
+        private string lnodesfilename;
+        private FileStream fsl;
+        private BinaryReader brl;
+        private BinaryWriter bwl;
+        private List<LNode> local_lnodes = new List<LNode>();
+
+
+        public NodesPart(string wnodesfilename, string lnodesfilename)
         {
-            this.nodepartfilename = nodepartfilename;
+            //this.nodepartfilename = nodepartfilename;
+            this.wnodesfilename = wnodesfilename;
+            this.lnodesfilename = lnodesfilename;
         }
         public void Init()
         { 
-            fs = File.Open(nodepartfilename, FileMode.OpenOrCreate, FileAccess.ReadWrite);
-            br = new BinaryReader(fs);
-            bw = new BinaryWriter(fs);
-            local_nodes = new List<CNode>();
+            fsw = File.Open(wnodesfilename, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+            brw = new BinaryReader(fsw);
+            bww = new BinaryWriter(fsw);
+            local_wnodes = new List<WNode>();
+
+            fsl = File.Open(lnodesfilename, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+            brl = new BinaryReader(fsl);
+            bwl = new BinaryWriter(fsl);
+            local_lnodes = new List<LNode>();
         }
         public int GetSetNode(UInt64 bword)
         {
             int code;
             if (!dic.TryGetValue(bword, out code))
             {
-                code = local_nodes.Count;
+                code = local_wnodes.Count;
                 dic.Add(bword, code);
-                local_nodes.Add(new CNode() { bword = bword });
+                local_wnodes.Add(new WNode() { bword = bword }); // Заполняются только слова узлов
             }
             return code;
         }
@@ -59,85 +78,119 @@ namespace DeBruijn
         {
             return bwords.Select(bw => GetSetNode(bw));
         }
-        public CNode GetNodeLocal(int nom) { return local_nodes[nom]; }
+        public LNode GetLNodeLocal(int nom) { return local_lnodes[nom]; }
+        
+        //TODO: Уже не нужна
         public void MakePrototype()
         {
-            bw.Seek(0, SeekOrigin.Begin);
-            bw.Write((long)local_nodes.Count);
-            foreach (var node in local_nodes)
+            bww.Seek(0, SeekOrigin.Begin);
+            bww.Write((long)local_wnodes.Count);
+            foreach (var node in local_wnodes)
             {
-                bw.Write(node.bword);
-                bw.Write(-1); // поля, которые в дальнейшем будут заполняться. -1 - null
-                bw.Write(-1);
+                bww.Write(node.bword);
             }
-            bw.Flush();
-            //fs.Close();
+            bww.Flush();
+
+            bwl.Seek(0, SeekOrigin.Begin);
+            bwl.Write((long)local_wnodes.Count);
+            foreach (var node in local_wnodes)
+            {
+                bwl.Write(-1); // поля, которые в дальнейшем будут заполняться. -1 - null
+                bwl.Write(-1);
+            }
+            bwl.Flush();
         }
-        public int Count() { return local_nodes.Count; }
-        public void Close() { fs.Close(); }
+        public int Count() 
+        {
+            // Какой-то один из списков не должен быть пустым
+            return local_lnodes.Count > 0 ? local_lnodes.Count : local_wnodes.Count; 
+        }
+        public void Close() { fsw.Close(); fsl.Close(); }
         public void Save()
         {
-            //fs.Position = 0L;
-            bw.Seek(0, SeekOrigin.Begin);
-            long nnodes = local_nodes.Count;
-            bw.Write(nnodes);
-            for (int i = 0; i < nnodes; i++)
+            // Список слов надо записывать ТОЛЬКО если его длина больше нуля
+            if (local_wnodes.Count > 0)
             {
-                var node = local_nodes[i];
-                bw.Write(node.bword);
-                bw.Write(node.prev);
-                bw.Write(node.next);
+                bww.Seek(0, SeekOrigin.Begin);
+                long wcount = local_wnodes.Count;
+                bww.Write(wcount);
+                for (int i = 0; i < wcount; i++)
+                {
+                    var node = local_wnodes[i];
+                    bww.Write(node.bword);
+                }
             }
-            fs.Close();
+            fsw.Close();
+
+            bwl.Seek(0, SeekOrigin.Begin);
+            long lcount = local_lnodes.Count;
+            bwl.Write(lcount);
+            for (int i = 0; i < lcount; i++)
+            {
+                var node = local_lnodes[i];
+                bwl.Write(node.prev);
+                bwl.Write(node.next);
+            }
+            fsl.Close();
         }
-        public void Restore()
+        public void RestoreWNodes()
         {
-            // Восстанавливаем файл и потоки
-            //fs = File.Open(nodepartfilename, FileMode.OpenOrCreate, FileAccess.ReadWrite);
-            //br = new BinaryReader(fs);
-            //bw = new BinaryWriter(fs);
-            // Восстанавливаем список
-            local_nodes = new List<CNode>();
-            fs.Position = 0L;
-            long nnodes = br.ReadInt64();
-            for (int i = 0; i < nnodes; i++)
+            local_wnodes = new List<WNode>();
+            fsw.Position = 0L;
+            long wcount = brw.ReadInt64();
+            for (int i = 0; i < wcount; i++)
             {
-                UInt64 bword = br.ReadUInt64();
-                int prev = br.ReadInt32();
-                int next = br.ReadInt32();
-                local_nodes.Add(new CNode() { bword = bword, prev = prev, next = next });
+                UInt64 bword = brw.ReadUInt64();
+                local_wnodes.Add(new WNode() { bword = bword });
             }
         }
-        
+        public void RestoreInitLNodes()
+        {
+            local_lnodes = Enumerable.Range(0, local_wnodes.Count).Select(i => new LNode() { prev = -1, next = -1 }).ToList();
+        }
+        public void RestoreDeactivateWNodes() { local_wnodes = new List<WNode>(); } 
+        public void RestoreLNodes()
+        { 
+            local_lnodes = new List<LNode>();
+            fsl.Position = 0L;
+            long lcount = brl.ReadInt64();
+            for (int i = 0; i < lcount; i++)
+            {
+                int prev = brl.ReadInt32();
+                int next = brl.ReadInt32();
+                local_lnodes.Add(new LNode() { prev = prev, next = next });
+            }
+        }
+
         public void DropDictionary() { dic = new Dictionary<ulong, int>(); }
 
         public void SetNodePrev(int local, int prevlink)
         {
             int node_nom = local;
-            var dnode = local_nodes[node_nom];
+            var dnode = local_lnodes[node_nom];
             if (dnode.prev == -1) { dnode.prev = prevlink; }
             else if (dnode.prev == prevlink) { }
             else if (dnode.prev == -2) { }
             else { dnode.prev = -2; }
-            local_nodes[node_nom] = dnode;
+            local_lnodes[node_nom] = dnode;
         }
         public void SetNodeNext(int local, int nextlink)
         {
             int node_nom = local;
-            var dnode = local_nodes[node_nom];
+            var dnode = local_lnodes[node_nom];
             if (dnode.next == -1) { dnode.next = nextlink; }
             else if (dnode.next == nextlink) { }
             else if (dnode.next == -2) { }
             else { dnode.next = -2; }
-            local_nodes[node_nom] = dnode;
+            local_lnodes[node_nom] = dnode;
         }
 
-        public IEnumerable<CNode> GetNodes(IEnumerable<int> codes)
+        public IEnumerable<LNode> GetNodes(IEnumerable<int> codes)
         {
             return codes.Select(code =>
             {
                 int node_nom = code >> Options.nshift;
-                var dnode = local_nodes[node_nom];
+                var dnode = local_lnodes[node_nom];
                 return dnode;
             });
         }
