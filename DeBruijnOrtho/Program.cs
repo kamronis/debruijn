@@ -16,31 +16,28 @@ namespace DeBruijn
         /// <param name="args"></param>
         public static void Main(string[] args)
         {
-            if (args.Length == 0)
-            {
-                MainMaster(0);
-                //MainClient(new string[] { "client n2.bin" });
-            }
-            else
-            {
-                int nclients;
-                if (Int32.TryParse(args[0], out nclients)) MainMaster(nclients);
-                else if (args[0] == "client") MainClient(args);
-                else throw new Exception("Error: wrong Main args");
-            }
-        }
-        public static void MainMaster(int nclients)
-        {
-            Console.WriteLine($"Start MainMaster {nclients}");
-            
             // Зафиксируем и вычислим некоторые параметры
-            Options.nparts = nclients + 1;
-            Options.nslaves = nclients;
-            
+            Options.nslaves = Options.nparts - 1;
             int mask = Options.nparts - 1;
             Options.nshift = 0;
             while (mask != 0) { mask >>= 1; Options.nshift++; }
 
+            if (args.Length == 0)
+            {
+                MainMaster(args);
+                //MainClient(new string[] { "client", @"D:\home\data\deBruijn\w2", @"D:\home\data\deBruijn\l2" });
+            }
+            else
+            {
+                if (args[0] == "master") MainMaster(args);
+                else if (args[0] == "client") MainClient(args);
+                else throw new Exception("Error: wrong Main args");
+            }
+        }
+        public static void MainMaster(string[] args)
+        {
+            int nclients = Options.nparts - 1;
+            Console.WriteLine($"Start MainMaster for {nclients} clients");
 
             // Сначала создадим сетевую конфигурацию
             ServerConnection sc = null;
@@ -52,13 +49,13 @@ namespace DeBruijn
 
             if (sc != null)
             {
-                // Проверяем клиентов тем, что пишем нулевую команду
-                foreach (var c in sc.clients) { c.BWriter.Write((byte)0); }
-                //sc.clients[0].BWriter.Write((byte)0);
-                Console.WriteLine($"Master sent command 0 to client {0}");
-                var result = sc.clients[0].BReader.ReadByte();
-                Console.WriteLine($"Master received value {result} from client {0}");
-                //sc.clients[0].BWriter.Write((byte)255);
+                //// Проверяем клиентов тем, что пишем нулевую команду -- здесь ОШИБКА
+                //foreach (var c in sc.clients) { c.BWriter.Write((byte)0); }
+                ////sc.clients[0].BWriter.Write((byte)0);
+                //Console.WriteLine($"Master sent command 0 to client {0}");
+                //var result = sc.clients[0].BReader.ReadByte();
+                //Console.WriteLine($"Master received value {result} from client {0}");
+                ////sc.clients[0].BWriter.Write((byte)255);
             }
             sw = new System.Diagnostics.Stopwatch();
             graph = new DeBruGraph(sc)
@@ -81,6 +78,14 @@ namespace DeBruijn
         public static void MainClient(string[] args) 
         {
             Console.WriteLine($"Start MainClient for {Options.host}");
+            string f1 = Options.wnodesfilename_net;
+            string f2 = Options.lnodesfilename_net;
+            if (args.Length > 2)
+            {
+                f1 = args[1]; Options.wnodesfilename_net = f1;
+                f2 = args[2]; Options.lnodesfilename_net = f2;
+            }
+
             NodesPart storage = new NodesPart(Options.wnodesfilename_net, Options.lnodesfilename_net);
             //storage.Init();
             ClientConnection connection = new ClientConnection(Options.host, Options.port, storage);
