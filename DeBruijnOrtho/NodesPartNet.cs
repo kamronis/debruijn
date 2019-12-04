@@ -140,5 +140,27 @@ namespace DeBruijn
         {
             bclient.BWriter.Write((byte)17);
         }
+
+        public IEnumerable<WNode> GetWNodes(IEnumerable<int> codes) // 17
+        {
+            bclient.BWriter.Write((byte)18);
+            int[] arr = codes.ToArray();
+            // Посылаем
+            bclient.BWriter.Write((long)arr.Length);
+            for (int i = 0; i < arr.Length; i++)
+            {
+                bclient.BWriter.Write(arr[i]);
+            }
+            // Принимаем
+            int nres = (int)bclient.BReader.ReadInt64();
+            if (nres != arr.Length) throw new Exception("2929334");
+            WNode[] warr = new WNode[nres];
+            for (int i = 0; i < nres; i++)
+            {
+                UInt64 bword = bclient.BReader.ReadUInt64();
+                warr[i] = new WNode() { bword = bword };
+            }
+            return warr;
+        }
     }
 }

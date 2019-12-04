@@ -27,6 +27,7 @@ namespace DeBruijn
         void SetNodeNext(int local, int nextlink);
 
         IEnumerable<LNode> GetNodes(IEnumerable<int> codes);
+        IEnumerable<WNode> GetWNodes(IEnumerable<int> codes);
     }
     public class NodesPart : INodePart
     {
@@ -192,6 +193,16 @@ namespace DeBruijn
                 int node_nom = code >> Options.nshift;
                 var dnode = local_lnodes[node_nom];
                 return dnode;
+            });
+        }
+
+        public IEnumerable<WNode> GetWNodes(IEnumerable<int> codes)
+        {
+            return codes.Select(code =>
+            {
+                int node_nom = code >> Options.nshift;
+                var wnode = local_wnodes[node_nom];
+                return wnode;
             });
         }
     }

@@ -18,9 +18,7 @@ namespace DeBruijn
         public static string lnodesfilename_net = masterfileplace + "lnodes_net.bin";
 
         // Эта часть опций должны вычисляться. Сейчас надо их задать!
-        public static int nparts = 4; // должна быть степень двойки
-        public static int nslaves = 3;// nparts - 1; // Стандартном случае - на единицу меньше, чем число частей может и совпадать
-        internal static int nshift = 2; // смещение в коде для раздела частей и локальных номеров - число единичек в бинарном представлении nparts-1
+        public static int nparts = 1; // должна быть степень двойки
 
         public static int nsymbols = 20;
 
@@ -32,5 +30,8 @@ namespace DeBruijn
         public static int bufferSize = 2000; // Размер буферов на сетевых стримах
         public static int buffcnodeslength = 2000;
 
+        // Эти - вычисляются по nparts
+        public static int nslaves;// nparts - 1; // Стандартном случае - на единицу меньше, чем число частей может и совпадать
+        internal static int nshift; // смещение в коде для раздела частей и локальных номеров - число единичек в бинарном представлении nparts-1
     }
 }

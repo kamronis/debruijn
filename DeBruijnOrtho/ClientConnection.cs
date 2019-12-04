@@ -104,6 +104,23 @@ namespace DeBruijn
             else if (comm == 15) { storage.RestoreInitLNodes(); }
             else if (comm == 16) { storage.RestoreDeactivateWNodes(); }
             else if (comm == 17) { storage.RestoreLNodes(); }
+            else if (comm == 18)
+            {
+                long nargs = br.ReadInt64();
+                int[] codes = new int[nargs];
+                for (int i = 0; i < nargs; i++)
+                {
+                    codes[i] = br.ReadInt32();
+                }
+                WNode[] resu = storage.GetWNodes(codes).ToArray();
+                if (resu.Length != codes.Length) throw new Exception("229849");
+                bw.Write((long)resu.Length);
+                for (int i = 0; i < nargs; i++)
+                {
+                    WNode cnode = resu[i];
+                    bw.Write(cnode.bword);
+                }
+            }
 
             else throw new Exception("Err: comm=" + comm);
             return true;

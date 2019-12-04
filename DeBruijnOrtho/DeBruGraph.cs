@@ -46,6 +46,14 @@ namespace DeBruijn
             // Восстанавливаем lnodes
             foreach (var part in parts) { part.RestoreLNodes(); }
         }
+        public void Restore62words()
+        {
+            // Можно деактивировать LNodes
+            //foreach (var part in parts) { part.RestoreDeactivateLNodes(); }
+            
+            // Восстанавливаем wnodes
+            foreach (var part in parts) { part.RestoreWNodes(); }
+        }
         public void Save()
         {
             foreach (var part in parts) { part.Save(); }
@@ -163,6 +171,45 @@ namespace DeBruijn
             }
             return results;
         }
+
+
+        internal IEnumerable<WNode> GetWNodes(IEnumerable<int> codes)
+        {
+            int mask = (int)(Options.nparts - 1);
+            int[] arr = codes.ToArray();
+
+            // Разбить массив аргументов по секциям (частям)
+            List<int>[] codesbysections = Enumerable.Repeat(1, Options.nparts).Select(w => new List<int>()).ToArray();
+            // Распределим
+            for (int i = 0; i < arr.Length; i++)
+            {
+                int code = arr[i];
+                int ipart = (int)(code & mask);
+                codesbysections[ipart].Add(code);
+            }
+
+            // Сделаем запросы к секциям
+            List<WNode>[] wnodesbysections = Enumerable.Repeat(1, Options.nparts).Select(i => new List<WNode>()).ToArray();
+            for (int j = 0; j < Options.nparts; j++)
+            {
+                wnodesbysections[j] = parts[j].GetWNodes(codesbysections[j]).ToList();
+            }
+
+            // Объединим результаты
+            int[] nextind = Enumerable.Repeat(0, Options.nparts).ToArray();
+            WNode[] results = new WNode[arr.Length];
+            for (int i = 0; i < arr.Length; i++)
+            {
+                int code = arr[i];
+                int ipart = (int)(code & mask);
+                WNode lnode = wnodesbysections[ipart][nextind[ipart]];
+                results[i] = lnode;
+                nextind[ipart] += 1;
+            }
+            return results;
+        }
+
+
         internal int ConstructCode(int part, int localcode)
         {
             return (localcode << Options.nshift) | part;
