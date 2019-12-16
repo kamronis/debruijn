@@ -62,18 +62,21 @@ namespace DeBruijn
             {
             };
 
-            //Main3(args); Main4(args); Main5(args); Main6(args);
+            DateTime tt0 = DateTime.Now;
 
             Main3();
             Main44();
             Main51();
             Main62();
 
+            DateTime tt1 = DateTime.Now;
             if (sc != null)
             {
                 foreach (var c in sc.clients) { c.BWriter.Write((byte)255); }
                 sc.Release();
             }
+
+            Console.WriteLine($"Total time: {(tt1-tt0).TotalMilliseconds} ms.");
         }
         public static void MainClient(string[] args) 
         {

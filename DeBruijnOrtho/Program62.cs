@@ -118,25 +118,28 @@ namespace DeBruijn
 
             // Выдача максимальной цепочки
             // В цепочке (надеюсь) больше 1 элемента, определяем код нулевого узла по первому, далее строим список кодов всех узлов
-            List<int> maxcodes = new List<int>();
-            maxcodes.Add(maxlist[1].prev);
-            for (int i = 0; i < maxlist.Length - 1; i++)
+            if (Options.toprintcontig)
             {
-                maxcodes.Add(maxlist[i].next);
-            }
+                List<int> maxcodes = new List<int>();
+                maxcodes.Add(maxlist[1].prev);
+                for (int i = 0; i < maxlist.Length - 1; i++)
+                {
+                    maxcodes.Add(maxlist[i].next);
+                }
 
-            // (Деактивировать LNodes,) активировать WNodes
-            graph.Restore62words();
+                // (Деактивировать LNodes,) активировать WNodes
+                graph.Restore62words();
 
-            ulong[] maxbwords = graph.GetWNodes(maxcodes).Select(wn => wn.bword).ToArray();
-            Console.Write(DBNode.UnCombine(maxbwords[0], nsymbols));
-            for (int i = 1; i < maxbwords.Length; i++)
-            {
-                var word = maxbwords[i];
-                string sword = DBNode.UnCombine(word, nsymbols);
-                Console.Write(sword[sword.Length - 1]);
+                ulong[] maxbwords = graph.GetWNodes(maxcodes).Select(wn => wn.bword).ToArray();
+                Console.Write(DBNode.UnCombine(maxbwords[0], nsymbols));
+                for (int i = 1; i < maxbwords.Length; i++)
+                {
+                    var word = maxbwords[i];
+                    string sword = DBNode.UnCombine(word, nsymbols);
+                    Console.Write(sword[sword.Length - 1]);
+                }
+                Console.WriteLine();
             }
-            Console.WriteLine();
 
 
             graph.Close();

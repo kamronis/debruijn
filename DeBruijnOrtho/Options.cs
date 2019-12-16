@@ -8,7 +8,7 @@ namespace DeBruijn
     {
         public static string masterfileplace = @"D:\Home\data\deBruijn\";
         public static string clientfileplace = @"D:\Home\data\deBruijn\";
-        public static string readsfilename = masterfileplace + "reads.txt";
+        public static string readsfilename = masterfileplace + "Gen_reads.txt";
         public static string breadsfilename = masterfileplace + "breads.bin";
         public static string creadsfilename = masterfileplace + "creads.bin";
 
@@ -30,6 +30,7 @@ namespace DeBruijn
         public static int bufferSize = 2000; // Размер буферов на сетевых стримах
         public static int buffcnodeslength = 2000;
 
+        public static bool toprintcontig = false;
         // Эти - вычисляются по nparts
         public static int nslaves;// nparts - 1; // Стандартном случае - на единицу меньше, чем число частей может и совпадать
         internal static int nshift; // смещение в коде для раздела частей и локальных номеров - число единичек в бинарном представлении nparts-1
