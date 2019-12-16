@@ -7,9 +7,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DeBruijnOrtho", "DeBruijnOr
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Experiments", "Experiments\Experiments.csproj", "{0BB19784-5BBD-45D8-92AC-E8CC95EBBC1B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeBruijnDirect", "DeBruijnDirect\DeBruijnDirect.csproj", "{3167AE76-7E29-4D8B-84C5-94D1190CAD8D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DeBruijnDirect", "DeBruijnDirect\DeBruijnDirect.csproj", "{3167AE76-7E29-4D8B-84C5-94D1190CAD8D}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DeBrein", "DeBrein\DeBrein.csproj", "{88D266B3-3BEE-4285-9865-FA77CDD4C961}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeBruijnTestGenerator", "DebruijnTestGenerator\DeBruijnTestGenerator.csproj", "{138D7044-B777-482B-AB2B-CA2D8E0F6D5F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{88D266B3-3BEE-4285-9865-FA77CDD4C961}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{88D266B3-3BEE-4285-9865-FA77CDD4C961}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{88D266B3-3BEE-4285-9865-FA77CDD4C961}.Release|Any CPU.Build.0 = Release|Any CPU
+		{138D7044-B777-482B-AB2B-CA2D8E0F6D5F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{138D7044-B777-482B-AB2B-CA2D8E0F6D5F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{138D7044-B777-482B-AB2B-CA2D8E0F6D5F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{138D7044-B777-482B-AB2B-CA2D8E0F6D5F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
