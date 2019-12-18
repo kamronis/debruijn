@@ -8,7 +8,8 @@ namespace DeBruijn
     {
         public static string masterfileplace = @"D:\Home\data\deBruijn\";
         public static string clientfileplace = @"D:\Home\data\deBruijn\";
-        public static string readsfilename = masterfileplace + "Gen_reads.txt";
+        public static string readsfilename = masterfileplace + "reads.txt";
+        //public static string readsfilename = masterfileplace + "Gen_reads.txt";
         public static string breadsfilename = masterfileplace + "breads.bin";
         public static string creadsfilename = masterfileplace + "creads.bin";
 
