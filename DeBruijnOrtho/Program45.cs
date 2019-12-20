@@ -8,18 +8,22 @@ namespace DeBruijn
 {
     partial class Program
     {
-        public static void Main44()
+        public static void Main45()
         {
-            Console.WriteLine("Start DeBruijnNametable Main44");
+            Console.WriteLine("Start DeBruijnNametable Main45");
 
             string tmp0 = Options.masterfileplace + "tmp0.bin";
             string tmp1 = Options.masterfileplace + "tmp1.bin";
 
             sw.Restart();
 
-            // Файл и поток бинарных ридов
-            Stream breadstream = File.Open(Options.breadsfilename, FileMode.Open, FileAccess.Read);
-            BinaryReader br = new BinaryReader(breadstream);
+            //// Файл и поток бинарных ридов
+            //Stream breadstream = File.Open(Options.breadsfilename, FileMode.Open, FileAccess.Read);
+            //BinaryReader br = new BinaryReader(breadstream);
+
+            // Файл и поток байтовыых ридов
+            Stream bytereadstream = File.Open(Options.bytereadsfilename, FileMode.Open, FileAccess.Read);
+            BinaryReader breader = new BinaryReader(bytereadstream);
 
             // Два альтернирующих файла, по очереди исполняющих роль входного и выходного потоков для кодированных ридов 
             FileStream fs0 = File.Open(tmp0, FileMode.OpenOrCreate, FileAccess.ReadWrite);
@@ -42,7 +46,9 @@ namespace DeBruijn
             {
                 Console.Write($"pass {lay} ");
                 // Перемотаем на начало бинарный рид 
-                breadstream.Position = 0L;
+                //breadstream.Position = 0L;
+                bytereadstream.Position = 0L;
+
                 // инициализируем входной и выходной стримы
                 filein = files[lay & 1]; fileout = files[(lay + 1) & 1];
                 BinaryReader binr = new BinaryReader(filein);
@@ -61,7 +67,6 @@ namespace DeBruijn
                     .ToArray();
 
                     // Обратиться к хранилищу
-                    //int[] codes = bwords.Select(bword => graph.GetSetNode(bword)).ToArray();
                     int[] codes = graph.GetSetNodes(bwords).ToArray();
 
                     // Выполнить итоговые действия, в том числе, с использованием полученного массива кодов
@@ -73,8 +78,6 @@ namespace DeBruijn
                         {
                             case 1:
                                 {
-                                    //UInt64 _bword = (UInt64)pars[1];
-                                    //int _code = graph.GetSetNode(_bword);
                                     int _code = codes[icode]; icode++;
                                     binw.Write(_code);
                                     break;
@@ -97,7 +100,10 @@ namespace DeBruijn
                 });
 
                 // Теперь читаем, читаем, пишем, при первом слое входной стрим не читаем
-                long nreeds = br.ReadInt64();
+                //long nreeds0 = br.ReadInt64();
+                long nreeds = breader.ReadInt64();
+                //if (nreeds != nreeds0) throw new Exception("2223223");
+
                 if (lay > 0) binr.ReadInt64();
                 binw.Write(nreeds);
 
@@ -106,16 +112,31 @@ namespace DeBruijn
                 {
                     if (ind % 1_000_000 == 0) Console.Write($"{ind / 1_000_000} ");
                     // читаем и пишем длину бинарного рида
-                    int nwords = (int)br.ReadInt64();
+                    //int nwords0 = (int)br.ReadInt64();
                     if (lay > 0) binr.ReadInt64();
+
+                    int len = (int)breader.ReadInt64();
+                    byte[] arr = breader.ReadBytes(len);
+                    // Формируем поток слов
+                    int nwords = len - Options.nsymbols + 1;
+                    //if (nwords != nwords0) throw new Exception("4994622");
+
                     //binw.Write((long)nwords);
                     group.Add(new object[] { 3, (long)nwords });
-
 
                     for (int nom = 0; nom < nwords; nom++)
                     {
                         // Читаем, читаем, пишем
-                        UInt64 bword = br.ReadUInt64();
+                        UInt64 bword; // = br.ReadUInt64();
+                        UInt64 word = 0;
+                        for (int j = 0; j < Options.nsymbols; j++)
+                        {
+                            // сдвигаем влево и делаем "или" с байтом
+                            word = (word << 2) | arr[nom + j];
+                        }
+                        //if (word != bword) throw new Exception("3423423");
+                        bword = word;
+
                         int code = -4;
                         if (lay > 0) code = binr.ReadInt32();
                         if (((bword >> Options.nshift) & (ulong)(Options.npasses - 1)) == (ulong)lay)
@@ -154,7 +175,8 @@ namespace DeBruijn
 
             //Console.WriteLine($"nodes.Count: {list.Count} Memory used {GC.GetTotalMemory(false)}");
             Console.WriteLine($"Create coded binary reeds file ok. duration: {sw.ElapsedMilliseconds}");
-            breadstream.Close();
+            //breadstream.Close();
+            bytereadstream.Close();
             //creadstream.Close();
 
         }

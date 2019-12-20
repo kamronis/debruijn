@@ -5,11 +5,95 @@ namespace Experiments
 {
     class Program
     {
+        static void Main()
+        {
+            Console.WriteLine("Start Experiments Main");
+            System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
+            string path = @"D:\Home\data\deBruijn\";
+            int nsymbols = 20;
+
+            sw.Restart();
+
+            // Рабочий поток
+            Stream binstream = File.Open(path + "outbinstream.bin", FileMode.OpenOrCreate, FileAccess.ReadWrite);
+            Stream bytestream = binstream; // new BufferedStream(binstream); //
+            BinaryWriter bwriter = new BinaryWriter(bytestream);
+
+            bool toload = false;
+
+            if (toload)
+            {
+                sw.Restart();
+                TextReader treader = new StreamReader(File.Open(path + "Gen_reads.txt", FileMode.Open, FileAccess.Read));
+                long nreeds = 0;
+                // Резервируем место для количества ридов
+                bwriter.Write(nreeds);
+                char[] chrs = new char[] { 'A', 'C', 'G', 'T' };
+                string str = "ACGT";
+
+                string line;
+                while ((line = treader.ReadLine()) != null)
+                {
+                    if (nreeds % 1_000_000 == 0) Console.Write($"{nreeds / 1_000_000} ");
+                    nreeds++;
+                    int nline = line.Length;
+                    byte[] reed = new byte[nline];
+                    for (int i = 0; i < reed.Length; i++)
+                    {
+                        char c = line[i];
+                        int pos = str.IndexOf(c);
+                        if (pos == -1) pos = 3;
+                        reed[i] = (byte)pos;
+                    }
+
+                    // Записываем длину бинарного рида
+                    bwriter.Write((long)reed.Length);
+                    // Записываем массив байтов
+                    bwriter.Write(reed);
+                }
+                Console.WriteLine();
+                // Записываем получившееся количество ридов, сбрасываем буфера
+                bytestream.Position = 0L;
+                bwriter.Write(nreeds);
+                bwriter.Flush();
+
+                sw.Stop();
+                Console.WriteLine($"Create binary reeds file ok. nreeds: {nreeds} duration: {sw.ElapsedMilliseconds}");
+                bytestream.Flush();
+            }
+            else
+            { // Работа с рабочим файлом
+                sw.Restart();
+                BinaryReader breader = new BinaryReader(bytestream);
+                bytestream.Position = 0L;
+                long nreeds = breader.ReadInt64();
+                for (long ii=0; ii<nreeds; ii++)
+                {
+                    int len = (int)breader.ReadInt64();
+                    byte[] arr = breader.ReadBytes(len);
+                    // Формируем поток слов
+                    int nwords = len - nsymbols + 1;
+                    for (int i=0; i<nwords; i++)
+                    {
+                        UInt64 word = 0;
+                        for (int j=0; j<nsymbols; j++)
+                        {
+                            // сдвигаем влево и делаем "или" с байтом
+                            word = (word << 2) | arr[i + j];
+                        }
+                    }
+                }
+                sw.Stop();
+                Console.WriteLine($"binary reeds file ok. nreeds: {nreeds} duration: {sw.ElapsedMilliseconds}");
+            }
+        }
+
+
         /// <summary>
         /// Читаю бинарные файлы (списков узлов) формата nlist и пишу один выходной того же формата
         /// </summary>
         /// <param name="args"></param>
-        static void Main(string[] args)
+        static void Main1()
         {
             Console.WriteLine("Merging nlist files");
             string[] filenames = new string[] { @"D:\Home\data\deBrein\nlist.bin", @"D:\Home\data\deBrein\nlist_net1.bin" };

@@ -39,7 +39,7 @@ namespace DeBruijn
                     // предыдущих несколько или предыдущий один, но у него несколько следующих.
                     // Кроме того, нет смысла рассматривать те узлы, у которых не единственный следующий.
 
-                    if (n % 1_000_000 == 0) Console.Write($"{n / 1_000_000} ");
+                    if (n % 100_000_000 == 0) Console.Write($"{n / 100_000_000} ");
                     codes.Add(graph.ConstructCode(ipart, n));
                     if (codes.Count >= Options.buffcnodeslength)
                     {
@@ -131,11 +131,11 @@ namespace DeBruijn
                 graph.Restore62words();
 
                 ulong[] maxbwords = graph.GetWNodes(maxcodes).Select(wn => wn.bword).ToArray();
-                Console.Write(DBNode.UnCombine(maxbwords[0], nsymbols));
+                Console.Write(DBNode.UnCombine(maxbwords[0], Options.nsymbols));
                 for (int i = 1; i < maxbwords.Length; i++)
                 {
                     var word = maxbwords[i];
-                    string sword = DBNode.UnCombine(word, nsymbols);
+                    string sword = DBNode.UnCombine(word, Options.nsymbols);
                     Console.Write(sword[sword.Length - 1]);
                 }
                 Console.WriteLine();

@@ -64,8 +64,8 @@ namespace DeBruijn
 
             DateTime tt0 = DateTime.Now;
 
-            Main3();
-            Main44();
+            Main31();
+            Main45();
             Main51();
             Main62();
 
