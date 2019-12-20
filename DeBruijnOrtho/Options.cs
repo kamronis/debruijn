@@ -7,9 +7,11 @@ namespace DeBruijn
     class Options
     {
         public static string masterfileplace = @"D:\Home\data\deBruijn\";
+        //public static string masterfileplace = @"D:\PROJECTS\DeBrein\";
         public static string clientfileplace = @"D:\Home\data\deBruijn\";
         //public static string readsfilename = masterfileplace + "reads.txt";
         public static string readsfilename = masterfileplace + "Gen_reads.txt";
+        //public static string readsfilename = masterfileplace + "50mil_reads.txt";
         public static string breadsfilename = masterfileplace + "breads.bin"; // Уже не нужен
         public static string bytereadsfilename = masterfileplace + "bytereads.bin";
         public static string creadsfilename = masterfileplace + "creads.bin";
