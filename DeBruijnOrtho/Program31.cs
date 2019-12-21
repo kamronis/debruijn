@@ -45,12 +45,12 @@ namespace DeBruijn
                     reed[i] = (byte)pos;
                 }
 
-                // В цикле формируем слов, синтаксически кодируем их, записываем бинарно
-                for (int nom = 0; nom < nwords; nom++)
-                {
-                    string word = line.Substring(nom, Options.nsymbols);
-                    var cword = DBNode.Combine(word);
-                }
+                //// В цикле формируем слов, синтаксически кодируем их, записываем бинарно
+                //for (int nom = 0; nom < nwords; nom++)
+                //{
+                //    string word = line.Substring(nom, Options.nsymbols);
+                //    var cword = DBNode.Combine(word);
+                //}
 
                 // Записываем длину бинарного рида
                 bwriter.Write((long)reed.Length);

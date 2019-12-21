@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO; 
 using System.Text;
 
 namespace DeBruijn
@@ -64,7 +65,11 @@ namespace DeBruijn
 
             DateTime tt0 = DateTime.Now;
 
-            Main31();
+            //Main31();
+            if (File.Exists(Options.wnodesfilename)) File.Delete(Options.wnodesfilename);
+            if (File.Exists(Options.lnodesfilename)) File.Delete(Options.lnodesfilename);
+            if (File.Exists(Options.wnodesfilename_net)) File.Delete(Options.wnodesfilename_net);
+            if (File.Exists(Options.lnodesfilename_net)) File.Delete(Options.lnodesfilename_net);
             Main45();
             Main51();
             Main62();

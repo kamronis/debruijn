@@ -17,13 +17,16 @@ namespace DeBruijn
 
             //NodesPart[] parts = new NodesPart[] { new NodesPart(@"D:\Home\data\deBrein\nlist.bin") };
             graph.InitParts();
+            Console.WriteLine("graph.InitParts() ok.");
             graph.Restore51();
+            Console.WriteLine("graph.Restore51() ok.");
 
             // Обработаем риды, сформируем граф
             sw.Restart();
             long nreeds = br.ReadInt64();
             for (long ind = 0; ind < nreeds; ind++)
             {
+                if (ind % 1000_000 == 0) Console.Write($"{ind / 1000_000} ");
                 // читаем длину бинарного рида
                 int nwords = (int)br.ReadInt64();
                 int codeprev = -1;

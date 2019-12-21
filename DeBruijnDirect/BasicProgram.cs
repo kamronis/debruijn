@@ -1,183 +1,99 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 
 namespace DeBruijnDirect
 {
     partial class Program
     {
-        static void Main()
+        static void Main0()
         {
-            Main1();
-        }
-        static void Main1()
-        {
-            Console.WriteLine("Start DeBruijnDirect version 1.");
+            Console.WriteLine("Start DeBruijnDirect.");
             System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
 
             // Данные читаются из файла, "слово" в n-граммном разбиении имеет длину nsymbols. 
+            // Есть рабочие данные и есть маленький файл с графом деБрейна
+            string readsfilename = @"D:\Home\data\deBruijn\reads.txt";
+            int nsymbols = 20;
+            int npasses = 2;
 
             sw.Start(); // запускаем секундомер
 
-            // Входной файл ридов
-            FileStream filereads = File.Open(DirectOptions.readsfilename, FileMode.Open, FileAccess.Read);
-            TextReader reader = new StreamReader(filereads);
-
-            // Сделаем байт-нарный файл ридов, его структура [[byte]] и бинарные ридер и райтер к нему
-            FileStream filebytereads = File.Open(DirectOptions.bytereadsfilename, FileMode.OpenOrCreate, FileAccess.ReadWrite);
-            BinaryWriter bwriter = new BinaryWriter(filebytereads);
-            BinaryReader breader = new BinaryReader(filebytereads);
-
-            // Преобразуем входной файл в бинарный
-            bwriter.Write(0L); // резервируем
-            string biochars = "ACGT";
-            int nreads = 0;
-            string line = null;
-            while ((line = reader.ReadLine()) != null)
-            {
-                nreads++;
-                // Переводим линию в массив байтов
-                int nline = line.Length;
-                byte[] breed = new byte[nline];
-                for (int i = 0; i < breed.Length; i++)
-                {
-                    char c = line[i];
-                    int pos = biochars.IndexOf(c);
-                    if (pos == -1) pos = 3;
-                    breed[i] = (byte)pos;
-                }
-                // Записываем длину бинарного рида
-                bwriter.Write((long)breed.Length);
-                // Записываем массив байтов
-                bwriter.Write(breed);
-            }
-            bwriter.Seek(0, SeekOrigin.Begin);
-            bwriter.Write((long)nreads);
-            bwriter.Flush();
-
-            Console.WriteLine("bytereads ok.");
-            reader.Close();
-
             // Две важнейших структуры и одна временная
-            List<ulong> ccodes = new List<ulong>(); // не используется!!!
-
+            List<ulong> ccodes = new List<ulong>();
+            List<int[]> creads = new List<int[]>();
             Dictionary<ulong, int> dic = new Dictionary<ulong, int>();
             int nnodes = 0;
 
-            // Файлы для накапливания кодированных ридов creads.bin
-            string f1name = DirectOptions.workdir + "f1.bin";
-            FileStream f1 = File.Open(f1name, FileMode.OpenOrCreate, FileAccess.ReadWrite);
-            string f2name = DirectOptions.workdir + "f2.bin";
-            FileStream f2 = File.Open(f2name, FileMode.OpenOrCreate, FileAccess.ReadWrite);
-            Stream[] streams = new Stream[] { f1, f2 };
-            int first = 0;
-            BinaryReader br = new BinaryReader(streams[first % 2]);
-            BinaryWriter bw = new BinaryWriter(streams[(first + 1) % 2]);
-
-            Action TogleFiles = () => 
-            {
-                f1.Position = 0L;
-                f2.Position = 0L;
-                first = (first + 1) % 2;
-                br = new BinaryReader(streams[first % 2]);
-                bw = new BinaryWriter(streams[(first + 1) % 2]);
-            };
+            FileStream fs = File.Open(readsfilename, FileMode.Open, FileAccess.Read);
+            TextReader reader = new StreamReader(fs);
 
             // Сканируем данные, вычисляем узлы
-            for (int ipass = 0; ipass < DirectOptions.npasses; ipass++)
+            for (int ipass = 0; ipass < npasses; ipass++)
             {
-                Console.WriteLine($"pass {ipass}: ");
+                string line;
+                int lcount = 0;
                 int nwords = 0;
-                filebytereads.Position = 0L;
-                long nnreads = breader.ReadInt64();
-                if (nnreads != nreads) throw new Exception("2234466");
-
-                // читаем и пишем число ридов в файлы
-                if (ipass != 0) { var nn = br.ReadInt64(); if (nn != nreads) throw new Exception("we46546"); }
-                bw.Write((long)nreads);
-                for (int iline = 0; iline < nreads; iline++)
+                fs.Position = 0L;
+                //for (int iline = 0; iline < lines.Count; iline++)
+                while ((line = reader.ReadLine()) != null)
                 {
-                    if (iline % 1000_000 == 0) { Console.CursorLeft = 0; Console.Write($"{(long)iline * 100L / (long)nreads}%      "); }
-                    int len = (int)breader.ReadInt64();
-                    byte[] bread = breader.ReadBytes(len);
+                    //line = lines[iline];
+                    int len = line.Length;
 
                     // создадим или прочитаем кодированный рид
                     int[] reed = null;
                     if (ipass == 0)
                     {
-                        reed = new int[len - DirectOptions.nsymbols + 1];
+                        reed = new int[len - nsymbols + 1];
+                        creads.Add(reed);
                     }
                     else
                     {
-                        int l_read = (int)br.ReadInt64();
-                        reed = new int[l_read];
-                        for (int i = 0; i < reed.Length; i++)
-                        {
-                            int c = br.ReadInt32();
-                            reed[i] = c;
-                        }
+                        reed = creads[lcount];
                     }
+                    lcount++;
 
-                    for (int i = 0; i < len - DirectOptions.nsymbols + 1; i++)
+                    for (int i = 0; i < len - nsymbols + 1; i++)
                     {
-                        UInt64 wd = 0;
-                        for (int j = 0; j < DirectOptions.nsymbols; j++)
-                        {
-                            // сдвигаем влево и делаем "или" с байтом
-                            wd = (wd << 2) | bread[i + j];
-                        }
-                        ulong bword = wd;
-
+                        // формируем слово
+                        string word = line.Substring(i, nsymbols);
+                        nwords++;
+                        // Переводим слово в бинарный вид
+                        ulong bword = Combine(word);
                         // находим или создаем текущий узел
-                        if ((int)(bword & (ulong)(DirectOptions.npasses - 1)) == ipass)
+                        if ((int)(bword & (ulong)(npasses - 1)) == ipass)
                         {
                             int code;
                             if (dic.TryGetValue(bword, out code)) { }
                             else
                             {
                                 code = nnodes;
+                                //ccodes.Add(bword);
                                 dic.Add(bword, code);
                                 nnodes++;
                             }
                             reed[i] = code;
                         }
                     }
-                    // Запишем кодированный рид
-                    bw.Write((long)reed.Length);
-                    for (int i = 0; i < reed.Length; i++) bw.Write(reed[i]);
                 }
-                if (ipass == DirectOptions.npasses - 1)
+                if (ipass == npasses - 1)
                 {
                     Console.WriteLine($"memory used after dictionaries: {GC.GetTotalMemory(false)}");
-                    Console.WriteLine($"lines:{nreads} words: {nwords} codes: {nnodes} dictionary : {dic.Count} elements");
+                    Console.WriteLine($"lines:{lcount} words: {nwords} codes: {nnodes} dictionary : {dic.Count} elements");
                 }
-                // Меняем файлы местами
-                TogleFiles();
                 // Теперь нам словарь не поднадобится
                 dic = new Dictionary<ulong, int>();
                 GC.Collect();
-                Console.WriteLine();
             }
 
             // Теперь нам нужны узлы со ссылками (номерами) prev и next
             PrevNext[] lnodes = new PrevNext[nnodes];
-            for (int i=0; i<nnodes; i++) { lnodes[i].prev = -1; lnodes[i].next = -1; }
+            for (int i = 0; i < nnodes; i++) { lnodes[i].prev = -1; lnodes[i].next = -1; }
 
             // Сканируем новые кодированные риды
-            long nr = br.ReadInt64();
-            if (nr != nreads) throw new Exception("8754332");
-            Console.WriteLine("Constructing graph: ");
-            for (int nom = 0; nom < nreads; nom++)
+            foreach (var cread in creads)
             {
-                if (nom % 1000000 == 0) Console.Write($"{nom / 1000000} ");
-                long nc = br.ReadInt64();
-                int[] cread = new int[nc];
-                for (int j = 0; j < nc; j++)
-                {
-                    int c = br.ReadInt32();
-                    cread[j] = c;
-                }
                 // код предыдущего узла
                 int previous = -1;
                 for (int i = 0; i < cread.Length; i++)
@@ -187,18 +103,16 @@ namespace DeBruijnDirect
                     if (previous != -1)
                     {
                         // дуга добавляется если нет ничего, а разрушается если дуга (ссылка) есть и существующая ссылка другая 
-                        lnodes[current].prev = lnodes[current].prev == -1 ? previous : 
+                        lnodes[current].prev = lnodes[current].prev == -1 ? previous :
                             (lnodes[current].prev == previous ? previous : -2);
-                        lnodes[previous].next = lnodes[previous].next == -1 ? current : 
+                        lnodes[previous].next = lnodes[previous].next == -1 ? current :
                             (lnodes[previous].next == current ? current : -2);
                     }
 
                     previous = current;
                 }
             }
-            Console.WriteLine();
 
-            Console.WriteLine("Building chains: ");
             // Находим начала цепочек
             List<PrevNext> startpoints = new List<PrevNext>();
             for (int n = 0; n < nnodes; n++) // n - номер, он же код узла
@@ -252,11 +166,39 @@ namespace DeBruijnDirect
             //    Console.Write(sword[sword.Length - 1]);
             //}
             //Console.WriteLine();
-            
+
             sw.Stop();
             Console.WriteLine($"total duration={sw.ElapsedMilliseconds}");
 
         }
 
+
+        public static ulong Combine(string sword)
+        {
+            ulong w = 0;
+            for (int i = 0; i < sword.Length; i++)
+            {
+                char c = sword[i];
+                ulong bits = 0;
+                if (c == 'A') bits = 0;
+                else if (c == 'C') bits = 1;
+                else if (c == 'G') bits = 2;
+                else bits = 3; // (c == 'T') и другие варианты
+                w = (w << 2) | bits;
+            }
+            return w;
+        }
+        private static char[] symbols = new char[] { 'A', 'C', 'G', 'T' };
+        public static string UnCombine(ulong word, int len)
+        {
+            char[] char_arr = new char[len];
+            ulong w = word;
+            for (int i = 0; i < len; i++)
+            {
+                char_arr[len - i - 1] = symbols[w & 3];
+                w >>= 2;
+            }
+            return new string(char_arr);
+        }
     }
 }

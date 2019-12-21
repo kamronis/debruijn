@@ -23,7 +23,7 @@ namespace DeBruijn
         public static int nparts = 1; // должна быть степень двойки
 
         public static int nsymbols = 20;
-        public static int npasses = 2; // Число проходов при кодировании слов (Program44)
+        public static int npasses = 4; // Число проходов при кодировании слов (Program44)
         public static int readslimit = Int32.MaxValue; // Пределньный пропуск количества ридов
 
         public static string host = "127.0.0.1"; // IP компьютера, на котором располагается мастер

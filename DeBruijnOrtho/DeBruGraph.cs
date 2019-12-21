@@ -36,7 +36,7 @@ namespace DeBruijn
             // Восстанавливаем wnodes, инициируем lnodes, деактивируем wnodes
             foreach (var part in parts) 
             { 
-                part.RestoreWNodes(); //TODO: Читать все не нужно-БЫ!
+                //part.RestoreWNodes(); //TODO: Читать все не нужно-БЫ!
                 part.RestoreInitLNodes();
                 part.RestoreDeactivateWNodes();
             }
