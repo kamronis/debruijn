@@ -11,8 +11,8 @@ namespace DeBruijnTestGenerator
     {
         static void Main(string[] args)
         {
-            //TextWriter line_twriter = new StreamWriter(File.Open(@"D:\PROJECTS\DeBrein\100mil_line.txt", FileMode.Create, FileAccess.Write)); //файл со строкой
-            //TextWriter reads_twriter = new StreamWriter(File.Open(@"D:\PROJECTS\DeBrein\100mil_reads.txt", FileMode.Create, FileAccess.Write)); //файл с ридами
+            //TextWriter line_twriter = new StreamWriter(File.Open(@"D:\PROJECTS\DeBrein\200mil_line.txt", FileMode.Create, FileAccess.Write)); //файл со строкой
+            //TextWriter reads_twriter = new StreamWriter(File.Open(@"D:\PROJECTS\DeBrein\200mil_reads.txt", FileMode.Create, FileAccess.Write)); //файл с ридами
             TextWriter line_twriter = new StreamWriter(File.Open(@"D:\Home\data\DeBruijn\line.txt", FileMode.Create, FileAccess.Write)); //файл со строкой
             TextWriter reads_twriter = new StreamWriter(File.Open(@"D:\Home\data\DeBruijn\Gen_reads.txt", FileMode.Create, FileAccess.Write)); //файл с ридами
             long size = 2_000_000_000; //размер исходной строки
@@ -31,12 +31,14 @@ namespace DeBruijnTestGenerator
 
             line_twriter.Close();
             Console.WriteLine("Line generation finished");
+            long real_length = 0;
             for (int i = 0; i < reads_count; i++) //генерация файла с ридами
             {
                 long position = LongRandom(0, size, random);
                 if (position + 100 <= size)
                 {
                     String read = "";
+                    real_length++;
                     for (int j = 0; j < 100; j++)
                     {
                         read += stringChars[position + j];
@@ -47,7 +49,7 @@ namespace DeBruijnTestGenerator
                 
             }
             reads_twriter.Close();
-            Console.WriteLine("Successfuly generated!");
+            Console.WriteLine($"Successfuly generated! Reads generated: {real_length}");
         }
 
         static long LongRandom(long min, long max, Random rand)
