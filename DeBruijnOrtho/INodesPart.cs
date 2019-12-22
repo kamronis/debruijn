@@ -8,7 +8,7 @@ namespace DeBruijn
 {
     public interface INodePart
     {
-        void Init();
+        void Init(bool firsttime);
         void RestoreWNodes();
         void RestoreInitLNodes();
         void RestoreDeactivateWNodes();
@@ -54,8 +54,16 @@ namespace DeBruijn
             this.wnodesfilename = wnodesfilename;
             this.lnodesfilename = lnodesfilename;
         }
-        public void Init()
+        public void Init(bool firsttime)
         {
+            if (firsttime)
+            {
+                if (File.Exists(Options.wnodesfilename)) File.Delete(Options.wnodesfilename);
+                if (File.Exists(Options.lnodesfilename)) File.Delete(Options.lnodesfilename);
+                if (File.Exists(Options.wnodesfilename_net)) File.Delete(Options.wnodesfilename_net);
+                if (File.Exists(Options.lnodesfilename_net)) File.Delete(Options.lnodesfilename_net);
+            }
+
             fsw = File.Open(wnodesfilename, FileMode.OpenOrCreate, FileAccess.ReadWrite);
             brw = new BinaryReader(fsw);
             bww = new BinaryWriter(fsw);

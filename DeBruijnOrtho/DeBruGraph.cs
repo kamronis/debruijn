@@ -15,10 +15,10 @@ namespace DeBruijn
         {
             this.sconnection = sconnection;    
         }
-        public void InitParts() 
+        public void InitParts(bool firsttime = false) 
         {
             parts = new INodePart[Options.nparts];
-            // Если число частей (степень двойки) совпадает с числом клиентов, то там части и распологаются, иначе нулевая часть помещается на мастере  
+            // Если число частей (степень двойки) совпадает с числом клиентов, то там части и располагаются, иначе нулевая часть помещается на мастере  
             if (Options.nparts == Options.nslaves)
             {
                 for (int i = 0; i < Options.nparts; i++) parts[i] = new NodesPartNet(sconnection.clients[i]);
@@ -29,7 +29,7 @@ namespace DeBruijn
                 for (int i = 1; i < Options.nparts; i++) parts[i] = new NodesPartNet(sconnection.clients[i - 1]);
             }
 
-            foreach (var part in parts) { part.Init(); }
+            foreach (var part in parts) { part.Init(firsttime); }
         }
         public void Restore51()
         {

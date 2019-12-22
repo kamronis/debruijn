@@ -99,7 +99,7 @@ namespace DeBruijn
                     bw.Write(cnode.next);
                 }
             }
-            else if (comm == 12) { storage.Init(); }
+            else if (comm == 12) { bool firsttime = br.ReadBoolean(); storage.Init(firsttime); }
             else if (comm == 14) { storage.RestoreWNodes(); }
             else if (comm == 15) { storage.RestoreInitLNodes(); }
             else if (comm == 16) { storage.RestoreDeactivateWNodes(); }

@@ -32,8 +32,13 @@ namespace DeBruijn
             this.wnodesfilename = wnodesfilename;
             this.lnodesfilename = lnodesfilename;
         }
-        public void Init()
-        { 
+        public void Init(bool firsttime)
+        {
+            if (firsttime)
+            {
+                if (File.Exists(wnodesfilename)) File.Delete(wnodesfilename);
+                if (File.Exists(lnodesfilename)) File.Delete(lnodesfilename);
+            }
             fsw = File.Open(wnodesfilename, FileMode.OpenOrCreate, FileAccess.ReadWrite);
             brw = new BinaryReader(fsw);
             bww = new BinaryWriter(fsw);

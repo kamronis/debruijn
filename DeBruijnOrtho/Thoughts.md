@@ -1076,3 +1076,4 @@ Extract chains ok. duration: 9382
 Total time: 303537,3613 ms.
 ```
 
+D:\Home\data\DeBruijn\w1 D:\Home\data\DeBruijn\l1

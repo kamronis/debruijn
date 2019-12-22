@@ -111,9 +111,10 @@ namespace DeBruijn
             }
             return carr;
         }
-        public void Init() // 12
+        public void Init(bool firsttime) // 12
         {
             bclient.BWriter.Write((byte)12);
+            bclient.BWriter.Write(firsttime);
         }
 
         public int GetSetNode(ulong bword) // 13

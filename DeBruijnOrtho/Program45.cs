@@ -17,10 +17,6 @@ namespace DeBruijn
 
             sw.Restart();
 
-            //// Файл и поток бинарных ридов
-            //Stream breadstream = File.Open(Options.breadsfilename, FileMode.Open, FileAccess.Read);
-            //BinaryReader br = new BinaryReader(breadstream);
-
             // Файл и поток байтовыых ридов
             Stream bytereadstream = File.Open(Options.bytereadsfilename, FileMode.Open, FileAccess.Read);
             BinaryReader breader = new BinaryReader(bytereadstream);
@@ -31,7 +27,7 @@ namespace DeBruijn
             FileStream[] files = new FileStream[] { fs0, fs1 };
             FileStream filein, fileout;
 
-            graph.InitParts();
+            graph.InitParts(true);
 
             // Создание cread
             sw.Restart();
