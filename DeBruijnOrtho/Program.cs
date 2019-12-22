@@ -38,7 +38,7 @@ namespace DeBruijn
         public static void MainMaster(string[] args)
         {
             int nclients = Options.nparts - 1;
-            Console.WriteLine($"Start MainMaster for {nclients} clients");
+            Console.WriteLine($"Start MainMaster for {nclients} clients. K: {Options.nsymbols} nparts: {Options.nparts} npasses: {Options.npasses}");
 
             // Сначала создадим сетевую конфигурацию
             ServerConnection sc = null;
@@ -65,7 +65,7 @@ namespace DeBruijn
 
             DateTime tt0 = DateTime.Now;
 
-            //Main31();
+            Main31();
             if (File.Exists(Options.wnodesfilename)) File.Delete(Options.wnodesfilename);
             if (File.Exists(Options.lnodesfilename)) File.Delete(Options.lnodesfilename);
             if (File.Exists(Options.wnodesfilename_net)) File.Delete(Options.wnodesfilename_net);

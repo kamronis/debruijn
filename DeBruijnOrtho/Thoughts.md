@@ -958,9 +958,121 @@ PrevNext занимает 8 Гб. в нынешнем исполнении и 16
 результаты: startpoints: 3.1 млн, maxchain: 10927. Задача явно решалась на пределе возможностей данного компьютера, 
 оперативная память все время была переполнена. Этот расчет выставил границу, она проходит между 1 и 2 миллиардами. 
 
+### 20191222 06:51
+Достигнутые результаты оптимистичны - кажется, поставленные задачи можно выполнить. Какие задачи? Главное - обработка генома
+"человеческого" объема, т.е. в 3+ миллиарда узлов и покрытием 50+. А что сейчас? Я обрабатываю 1 млрд. нодов с покрытием 10. 
+Нужно в 15 раз больше оперативной памяти. Наверное, нужно 256 Гб. ОЗУ. Что более важно, надо изменить разрядность вычислений.
+То есть, слово должно быть до 78 символов, а длина кода не меньше 5 байтов. 
 
+Начну исследование программ. Сначала испытаю в разных режимах. 
+```
+Start DeBruijnDirect version 1.1 passes: 1 K: 20
+bytereads ok.
+pass 0: 
+0% memory used after dictionaries: 672854472
+lines:495108 words: 0 codes: 23770764 dictionary : 23770764 elements
 
+Constructing graph: 
+0 
+Building chains: 
+# startpoins: 361572
+maxchain: 894
+total duration=13964
+```
+Одномашинный и однопроходный DeBruijnOrtho дает следующие результаты:
+```
+Start MainMaster for 0 clients. K: 20 nparts: 1 npasses: 1
+Start DeBruijnOrtho Main31
+0 
+Create binary reeds file ok. duration: 670
+Start DeBruijnNametable Main45
+pass 0 0 
+Memory used: 116696
+Create coded binary reeds file ok. duration: 16011
+Start Main51
+0 
+Create Graph ok. duration: 3750
+Start Main62: Extract chains.
+part 0  #nodes 23770764
+0 
 
+chains: 377529
+==== maxchain: 894
+Extract chains ok. duration: 4325
+Total time: 25008,4304 ms.
+```
+Стандартный двухпроходный:
+```
+Start MainMaster for 0 clients. K: 20 nparts: 4 npasses: 2
+Start DeBruijnOrtho Main31
+0 
+Create binary reeds file ok. duration: 666
+Start DeBruijnNametable Main45
+pass 0 0 
+pass 1 0 
+Memory used: 120816
+Create coded binary reeds file ok. duration: 24658
+Start Main51
+0 
+Create Graph ok. duration: 3823
+Start Main62: Extract chains.
+part 0  #nodes 23770764
+0 
 
+chains: 377529
+==== maxchain: 894
+Extract chains ok. duration: 4588
+Total time: 33892,9386 ms.
+```
+Пропустил и с 4 задачами, правда сначала, как всегда, забыл, что для клиента надо задавать 2 файла. Получилось нормально и даже
+быстро - 59 сек. число цепей совпало и максимальная цепь (по числу элементов) совпала. Теперь надо посмотреть на разницу при 
+работе с синтетическими (сгенерированными) данными.
 
+А у Трошкова по-прежнему получается долго: 
+```
+Started: 20.12.2019 13:12:56,71 
+Start MainMaster for 0 clients
+Start DeBruijnOrtho Main31
+0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 
+Create binary reeds file ok. duration: 1248013
+Start DeBruijnNametable Main45
+pass 0 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 
+pass 1 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 
+Memory used: 4295060496
+Create coded binary reeds file ok. duration: 3106195
+Start Main51
+Create Graph ok. duration: 442403
+Start Main62: Extract chains.
+part 0  #nodes 499735778
+0 1 2 3 4 
+chains: 270117
+==== maxchain: 27327
+Extract chains ok. duration: 110913
+Total time: 4940459,6 ms.
+Started: 20.12.2019 13:12:56,71 
+Completed: 20.12.2019 14:35:22,18 
+```
+Теперь посмотю как ведет себя программа на сгенерированных данных. 
+```
+Start MainMaster for 0 clients. K: 20 nparts: 1 npasses: 2
+Start DeBruijnOrtho Main31
+0 1 2 3 4 
+Create binary reeds file ok. duration: 10009
+Start DeBruijnNametable Main45
+pass 0 0 1 2 3 4 
+pass 1 0 1 2 3 4 
+Memory used: 121024
+Create coded binary reeds file ok. duration: 256279
+Start Main51
+0 1 2 3 4 
+Create Graph ok. duration: 27279
+Start Main62: Extract chains.
+part 0  #nodes 49983553
+0 
+
+chains: 4261
+==== maxchain: 132225
+Extract chains ok. duration: 9382
+Total time: 303537,3613 ms.
+```
 

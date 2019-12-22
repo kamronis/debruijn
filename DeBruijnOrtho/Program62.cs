@@ -44,28 +44,37 @@ namespace DeBruijn
                     if (codes.Count >= Options.buffcnodeslength)
                     {
                         LNode[] nodes = graph.GetNodes(codes).ToArray();
-                        var nset1 = nodes
-                            .Where(nd => nd.prev == -1 || nd.prev == -2);
-                        var cset2 = nodes
-                            .Where(nd => !(nd.prev == -1 || nd.prev == -2)).Select(nd => nd.prev);
-                        var nset3 = graph.GetNodes(cset2)
-                            .Where(ndd1 => ndd1.next == -2);
+                        // Множество узлов у которых есть следующий и нет предыдущего - эти все годятся как начальные узлы
+                        IEnumerable<LNode> nset1 = nodes
+                            .Where(nd => nd.next >= 0 && nd.prev < 0);
+                        // Множество узлов у которых есть следующий и есть предыдущий, его надо дополнительно проверить.
+                        LNode[] nset2 = nodes
+                            .Where(nd => nd.next >= 0 && nd.prev >= 0).ToArray();
+                        // Для проверки формируем множество кодов предыдущих узлов
+                        IEnumerable<int> cset = nset2.Select(nd => nd.prev);
+                        // Находим по нему узлы, формируем массив
+                        LNode[] nset3 = graph.GetNodes(cset).ToArray(); // элементы nset3 позиционно соответствуют nset2
                         startpoints.AddRange(nset1);
-                        startpoints.AddRange(nset3);
+                        startpoints.AddRange(nset2.Where((nd, ind) => nset3[ind].next < 0));
                         codes = new List<int>();
                     }
                 }
+                Console.WriteLine();
                 if (codes.Count > 0)
                 {
                     LNode[] nodes = graph.GetNodes(codes).ToArray();
-                    var nset1 = nodes
-                        .Where(nd => nd.prev == -1 || nd.prev == -2);
-                    var cset2 = nodes
-                        .Where(nd => !(nd.prev == -1 || nd.prev == -2)).Select(nd => nd.prev);
-                    var nset3 = graph.GetNodes(cset2)
-                        .Where(ndd1 => ndd1.next == -2);
+                    // Множество узлов у которых есть следующий и нет предыдущего - эти все годятся как начальные узлы
+                    IEnumerable<LNode> nset1 = nodes
+                        .Where(nd => nd.next >= 0 && nd.prev < 0);
+                    // Множество узлов у которых есть следующий и есть предыдущий, его надо дополнительно проверить.
+                    LNode[] nset2 = nodes
+                        .Where(nd => nd.next >= 0 && nd.prev >= 0).ToArray();
+                    // Для проверки формируем множество кодов предыдущих узлов
+                    IEnumerable<int> cset = nset2.Select(nd => nd.prev);
+                    // Находим по нему узлы, формируем массив
+                    LNode[] nset3 = graph.GetNodes(cset).ToArray(); // элементы nset3 позиционно соответствуют nset2
                     startpoints.AddRange(nset1);
-                    startpoints.AddRange(nset3);
+                    startpoints.AddRange(nset2.Where((nd, ind) => nset3[ind].next < 0));
                     codes = new List<int>();
                 }
                 Console.WriteLine();

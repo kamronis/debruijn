@@ -15,7 +15,7 @@ namespace DeBruijnTestGenerator
             //TextWriter reads_twriter = new StreamWriter(File.Open(@"D:\PROJECTS\DeBrein\200mil_reads.txt", FileMode.Create, FileAccess.Write)); //файл с ридами
             TextWriter line_twriter = new StreamWriter(File.Open(@"D:\Home\data\DeBruijn\line.txt", FileMode.Create, FileAccess.Write)); //файл со строкой
             TextWriter reads_twriter = new StreamWriter(File.Open(@"D:\Home\data\DeBruijn\Gen_reads.txt", FileMode.Create, FileAccess.Write)); //файл с ридами
-            long size = 2_000_000_000; //размер исходной строки
+            long size = 20_000_000; //размер исходной строки
             int coverage = 10; // сколько раз полностью покрыть строку с помощью 100 символов
             long reads_count = (size / 100) * coverage; //количество ридов в результате
             string chars = "ACGT";

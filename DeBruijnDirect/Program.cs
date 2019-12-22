@@ -13,7 +13,7 @@ namespace DeBruijnDirect
         }
         static void Main1()
         {
-            Console.WriteLine("Start DeBruijnDirect version 1.");
+            Console.WriteLine($"Start DeBruijnDirect version 1.1, passes: {DirectOptions.npasses}, K: {DirectOptions.nsymbols}");
             System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
 
             // Данные читаются из файла, "слово" в n-граммном разбиении имеет длину nsymbols. 
@@ -80,8 +80,8 @@ namespace DeBruijnDirect
                 f1.Position = 0L;
                 f2.Position = 0L;
                 first = (first + 1) % 2;
-                br = new BinaryReader(streams[first % 2]);
-                bw = new BinaryWriter(streams[(first + 1) % 2]);
+                br = new BinaryReader(streams[first % 2]); br.BaseStream.Flush();
+                bw = new BinaryWriter(streams[(first + 1) % 2]); bw.BaseStream.Flush();
             };
 
             // Сканируем данные, вычисляем узлы
@@ -98,7 +98,7 @@ namespace DeBruijnDirect
                 bw.Write((long)nreads);
                 for (int iline = 0; iline < nreads; iline++)
                 {
-                    if (iline % 1000_000 == 0) { Console.CursorLeft = 0; Console.Write($"{(long)iline * 100L / (long)nreads}%      "); }
+                    if (iline % 1000_000 == 0) { /*Console.CursorLeft = 0;*/ Console.Write($"{(long)iline * 100L / (long)nreads}% "); }
                     int len = (int)breader.ReadInt64();
                     byte[] bread = breader.ReadBytes(len);
 
@@ -198,7 +198,18 @@ namespace DeBruijnDirect
             }
             Console.WriteLine();
 
-            Console.WriteLine("Building chains: ");
+            // Выдача lnodes.bin для проверки
+            using (BinaryWriter w = new BinaryWriter(File.Open(DirectOptions.workdir + "lnodes_d.bin", FileMode.Create, FileAccess.Write)))
+            {
+                w.Write((long)lnodes.Length);
+                for (int i = 0; i < lnodes.Length; i++)
+                {
+                    w.Write(lnodes[i].prev);
+                    w.Write(lnodes[i].next);
+                }
+            }
+
+            Console.WriteLine("Building chains");
             // Находим начала цепочек
             List<PrevNext> startpoints = new List<PrevNext>();
             for (int n = 0; n < nnodes; n++) // n - номер, он же код узла

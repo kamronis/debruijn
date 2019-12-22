@@ -17,9 +17,7 @@ namespace DeBruijn
 
             //NodesPart[] parts = new NodesPart[] { new NodesPart(@"D:\Home\data\deBrein\nlist.bin") };
             graph.InitParts();
-            Console.WriteLine("graph.InitParts() ok.");
             graph.Restore51();
-            Console.WriteLine("graph.Restore51() ok.");
 
             // Обработаем риды, сформируем граф
             sw.Restart();
@@ -41,6 +39,7 @@ namespace DeBruijn
                     codeprev = code;
                 }
             }
+            Console.WriteLine();
 
             graph.Save();
             graph.Close();

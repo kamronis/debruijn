@@ -22,10 +22,10 @@ namespace DeBruijn
         public static string lnodesfilename_net = masterfileplace + "lnodes_net.bin";
 
         // Эта часть опций должны вычисляться. Сейчас надо их задать!
-        public static int nparts = 1; // должна быть степень двойки
 
         public static int nsymbols = 20;
-        public static int npasses = 4; // Число проходов при кодировании слов (Program44)
+        public static int nparts = 1; // должна быть степень двойки
+        public static int npasses = 1; // Число проходов при кодировании слов (Program44)
         public static int readslimit = Int32.MaxValue; // Пределньный пропуск количества ридов
 
         public static string host = "127.0.0.1"; // IP компьютера, на котором располагается мастер
