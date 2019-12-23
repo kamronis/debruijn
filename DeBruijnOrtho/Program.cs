@@ -25,9 +25,9 @@ namespace DeBruijn
 
             if (args.Length == 0)
             {
-                //MainMaster(args);
+                MainMaster(args);
                 //MainClient(new string[] { "client", @"D:\home\data\deBruijn\w2", @"D:\home\data\deBruijn\l2" });
-                MainClient(new string[] { "client" });
+                //MainClient(new string[] { "client" });
             }
             else
             {
@@ -67,11 +67,8 @@ namespace DeBruijn
             DateTime tt0 = DateTime.Now;
 
             Main31();
-            //if (File.Exists(Options.wnodesfilename)) File.Delete(Options.wnodesfilename);
-            //if (File.Exists(Options.lnodesfilename)) File.Delete(Options.lnodesfilename);
-            //if (File.Exists(Options.wnodesfilename_net)) File.Delete(Options.wnodesfilename_net);
-            //if (File.Exists(Options.lnodesfilename_net)) File.Delete(Options.lnodesfilename_net);
-            Main45();
+            //Main45();
+            Main46();
             Main51();
             Main62();
 
