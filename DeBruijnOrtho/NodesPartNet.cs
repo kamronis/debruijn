@@ -12,7 +12,7 @@ namespace DeBruijn
         public NodesPartNet(BinaryClient bclient) { this.bclient = bclient; }
         // Команды: 
 
-        public IEnumerable<int> GetSetNodes(IEnumerable<ulong> bwords) // 1
+        public IEnumerable<int> GetSetNodes(IEnumerable<UInt64> bwords) // 1
         {
             // Послать команду 1
             bclient.BWriter.Write((byte)1);
@@ -104,7 +104,6 @@ namespace DeBruijn
             LNode[] carr = new LNode[nres];
             for (int i = 0; i< nres; i++)
             {
-                //UInt64 bword = bclient.BReader.ReadUInt64();
                 int prev = bclient.BReader.ReadInt32();
                 int next = bclient.BReader.ReadInt32();
                 carr[i] = new LNode() { prev = prev, next = next };
@@ -117,7 +116,7 @@ namespace DeBruijn
             bclient.BWriter.Write(firsttime);
         }
 
-        public int GetSetNode(ulong bword) // 13
+        public int GetSetNode(BWord bword) // 13
         {
             throw new NotImplementedException();
         }
@@ -142,7 +141,7 @@ namespace DeBruijn
             bclient.BWriter.Write((byte)17);
         }
 
-        public IEnumerable<WNode> GetWNodes(IEnumerable<int> codes) // 17
+        public IEnumerable<BWord> GetWNodes(IEnumerable<int> codes) // 17
         {
             bclient.BWriter.Write((byte)18);
             int[] arr = codes.ToArray();
@@ -155,13 +154,18 @@ namespace DeBruijn
             // Принимаем
             int nres = (int)bclient.BReader.ReadInt64();
             if (nres != arr.Length) throw new Exception("2929334");
-            WNode[] warr = new WNode[nres];
+            BWord[] warr = new BWord[nres];
             for (int i = 0; i < nres; i++)
             {
-                UInt64 bword = bclient.BReader.ReadUInt64();
-                warr[i] = new WNode() { bword = bword };
+                BWord bword = BWord.ReadBWord(bclient.BReader); //bclient.BReader.ReadUInt64();
+                warr[i] = bword; //new WNode() { bword = bword.ToUInt64() };
             }
             return warr;
+        }
+
+        public IEnumerable<int> GetSetNodes(IEnumerable<BWord> bwords)
+        {
+            throw new NotImplementedException();
         }
     }
 }

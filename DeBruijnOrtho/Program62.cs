@@ -139,14 +139,23 @@ namespace DeBruijn
                 // (Деактивировать LNodes,) активировать WNodes
                 graph.Restore62words();
 
-                ulong[] maxbwords = graph.GetWNodes(maxcodes).Select(wn => wn.bword).ToArray();
-                Console.Write(DBNode.UnCombine(maxbwords[0], Options.nsymbols));
+                BWord[] maxbwords = graph.GetWNodes(maxcodes).ToArray();
+                string previous = maxbwords[0].ToString(); //DBNode.UnCombine(maxbwords[0], Options.nsymbols);
+                Console.Write(previous);
+                bool notachain = false;
                 for (int i = 1; i < maxbwords.Length; i++)
                 {
                     var word = maxbwords[i];
-                    string sword = DBNode.UnCombine(word, Options.nsymbols);
+                    string sword = word.ToString(); //DBNode.UnCombine(word, Options.nsymbols);
+                    for (int j = 1; j < BWord.nsymbols; j++)
+                    {
+                        if (previous[j] != sword[j - 1]) { notachain = true; break; }
+                    }
+                    if (notachain) break;
                     Console.Write(sword[sword.Length - 1]);
+                    previous = sword;
                 }
+                if (notachain) Console.Write("Not a chain!!!");
                 Console.WriteLine();
             }
 

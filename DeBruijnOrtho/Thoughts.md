@@ -1028,52 +1028,10 @@ Total time: 33892,9386 ms.
 быстро - 59 сек. число цепей совпало и максимальная цепь (по числу элементов) совпала. Теперь надо посмотреть на разницу при 
 работе с синтетическими (сгенерированными) данными.
 
-А у Трошкова по-прежнему получается долго: 
-```
-Started: 20.12.2019 13:12:56,71 
-Start MainMaster for 0 clients
-Start DeBruijnOrtho Main31
-0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 
-Create binary reeds file ok. duration: 1248013
-Start DeBruijnNametable Main45
-pass 0 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 
-pass 1 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 
-Memory used: 4295060496
-Create coded binary reeds file ok. duration: 3106195
-Start Main51
-Create Graph ok. duration: 442403
-Start Main62: Extract chains.
-part 0  #nodes 499735778
-0 1 2 3 4 
-chains: 270117
-==== maxchain: 27327
-Extract chains ok. duration: 110913
-Total time: 4940459,6 ms.
-Started: 20.12.2019 13:12:56,71 
-Completed: 20.12.2019 14:35:22,18 
-```
-Теперь посмотю как ведет себя программа на сгенерированных данных. 
-```
-Start MainMaster for 0 clients. K: 20 nparts: 1 npasses: 2
-Start DeBruijnOrtho Main31
-0 1 2 3 4 
-Create binary reeds file ok. duration: 10009
-Start DeBruijnNametable Main45
-pass 0 0 1 2 3 4 
-pass 1 0 1 2 3 4 
-Memory used: 121024
-Create coded binary reeds file ok. duration: 256279
-Start Main51
-0 1 2 3 4 
-Create Graph ok. duration: 27279
-Start Main62: Extract chains.
-part 0  #nodes 49983553
-0 
+А у Трошкова по-прежнему получается долго. При анализе получается, что он вычислял на параметрах, существенно больших,
+чем заявлял. Напр. заявлял на 50 млн., вычислял на 500 млн. узлов. 
 
-chains: 4261
-==== maxchain: 132225
-Extract chains ok. duration: 9382
-Total time: 303537,3613 ms.
-```
+Также я нашел ошибку, приводившую к расхождению результатов просчета разными методами. Теперь все одинаково.
 
-D:\Home\data\DeBruijn\w1 D:\Home\data\DeBruijn\l1
+### 20191223 10:02
+Я начал переделывать кодирование в программе DeBruijnOrtho. По плану, там должно быть кодирование слов набором байтов

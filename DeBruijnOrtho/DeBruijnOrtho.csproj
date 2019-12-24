@@ -5,4 +5,10 @@
     <TargetFramework>netcoreapp2.2</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Compile Remove="Program3.cs" />
+    <Compile Remove="Program44.cs" />
+    <Compile Remove="Program45.cs" />
+  </ItemGroup>
+
 </Project>

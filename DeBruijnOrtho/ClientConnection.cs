@@ -35,10 +35,10 @@ namespace DeBruijn
             {
                 // Читаем длину, создаем вектор, читаем вектор
                 long len = br.ReadInt64();
-                UInt64[] arr = new UInt64[len];
+                BWord[] arr = new BWord[len];
                 for (int i = 0; i < len; i++)
                 {
-                    arr[i] = br.ReadUInt64();
+                    arr[i] = BWord.ReadBWord(br);
                 }
                 // Выполним команду
                 var result = storage.GetSetNodes(arr);
@@ -112,13 +112,13 @@ namespace DeBruijn
                 {
                     codes[i] = br.ReadInt32();
                 }
-                WNode[] resu = storage.GetWNodes(codes).ToArray();
+                BWord[] resu = storage.GetWNodes(codes).ToArray();
                 if (resu.Length != codes.Length) throw new Exception("229849");
                 bw.Write((long)resu.Length);
                 for (int i = 0; i < nargs; i++)
                 {
-                    WNode cnode = resu[i];
-                    bw.Write(cnode.bword);
+                    BWord cnode = resu[i];
+                    BWord.WriteBWord(cnode, bw);
                 }
             }
 

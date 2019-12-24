@@ -32,7 +32,7 @@ namespace DeBruijn
                 if (nreeds % 1_000_000 == 0) Console.Write($"{nreeds / 1_000_000} ");
                 nreeds++;
                 
-                int nwords = line.Length - Options.nsymbols + 1;
+                int nwords = line.Length - BWord.nsymbols + 1;
 
                 // Переводим линию в массив байтов
                 int nline = line.Length;

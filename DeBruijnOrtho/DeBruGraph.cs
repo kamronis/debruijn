@@ -66,26 +66,19 @@ namespace DeBruijn
         {
             foreach (var part in parts) { part.DropDictionary(); }
         }
-        public int GetSetNode(UInt64 bword)
-        {
-            UInt64 mask = (UInt64)(Options.nparts - 1);
-            int ipart = (int)(bword & mask);
-            int localcode = parts[ipart].GetSetNode(bword);
-            return (localcode << Options.nshift) | ipart;
-        }
-        public IEnumerable<int> GetSetNodes(IEnumerable<UInt64> bwords)
+        public IEnumerable<int> GetSetNodes(IEnumerable<BWord> bwords)
         {
             //return bwords.Select(w => GetSetNode(w));
-            UInt64 mask = (UInt64)(Options.nparts - 1);
-            UInt64[] arr = bwords.ToArray();
+            int mask = (Options.nparts - 1);
+            BWord[] arr = bwords.ToArray();
 
             // Разбить массив аргументов по секциям (частям)
-            List<UInt64>[] wordsbysections = Enumerable.Repeat(1, Options.nparts).Select(w => new List<UInt64>()).ToArray(); 
+            List<BWord>[] wordsbysections = Enumerable.Repeat(1, Options.nparts).Select(w => new List<BWord>()).ToArray(); 
             // Распределим
             for (int i = 0; i < arr.Length; i++)
             {
-                UInt64 bword = arr[i];
-                int ipart = (int)(bword & mask);
+                BWord bword = arr[i];
+                int ipart = bword.Lay; //(int)(bword & mask);
                 wordsbysections[ipart].Add(bword);
             }
 
@@ -101,8 +94,8 @@ namespace DeBruijn
             int[] results = new int[arr.Length];
             for (int i = 0; i < arr.Length; i++)
             {
-                UInt64 bword = arr[i];
-                int ipart = (int)(bword & mask);
+                BWord bword = arr[i];
+                int ipart = bword.Lay; //(int)(bword & mask);
                 int localcode = codesbysections[ipart][nextind[ipart]];
                 nextind[ipart] += 1;
                 results[i] = (localcode << Options.nshift) | ipart;
@@ -173,7 +166,7 @@ namespace DeBruijn
         }
 
 
-        internal IEnumerable<WNode> GetWNodes(IEnumerable<int> codes)
+        internal IEnumerable<BWord> GetWNodes(IEnumerable<int> codes)
         {
             int mask = (int)(Options.nparts - 1);
             int[] arr = codes.ToArray();
@@ -189,7 +182,7 @@ namespace DeBruijn
             }
 
             // Сделаем запросы к секциям
-            List<WNode>[] wnodesbysections = Enumerable.Repeat(1, Options.nparts).Select(i => new List<WNode>()).ToArray();
+            List<BWord>[] wnodesbysections = Enumerable.Repeat(1, Options.nparts).Select(i => new List<BWord>()).ToArray();
             for (int j = 0; j < Options.nparts; j++)
             {
                 wnodesbysections[j] = parts[j].GetWNodes(codesbysections[j]).ToList();
@@ -197,12 +190,12 @@ namespace DeBruijn
 
             // Объединим результаты
             int[] nextind = Enumerable.Repeat(0, Options.nparts).ToArray();
-            WNode[] results = new WNode[arr.Length];
+            BWord[] results = new BWord[arr.Length];
             for (int i = 0; i < arr.Length; i++)
             {
                 int code = arr[i];
                 int ipart = (int)(code & mask);
-                WNode lnode = wnodesbysections[ipart][nextind[ipart]];
+                BWord lnode = wnodesbysections[ipart][nextind[ipart]];
                 results[i] = lnode;
                 nextind[ipart] += 1;
             }

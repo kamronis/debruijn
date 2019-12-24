@@ -8,7 +8,7 @@ namespace DeBruijn
 {
     public class NodesPart : INodePart
     {
-        private Dictionary<UInt64, int> dic = new Dictionary<ulong, int>();
+        private Dictionary<BWord, int> dic = new Dictionary<BWord, int>();
 
         private string wnodesfilename;
         private FileStream fsw;
@@ -16,7 +16,7 @@ namespace DeBruijn
         private BinaryWriter bww;
         int local_wnodesCount;
         //private List<WNode> local_wnodes = new List<WNode>();
-        private WNode[] local_wnodes = null;
+        private BWord[] local_wnodes = null;
 
         private string lnodesfilename;
         private FileStream fsl;
@@ -59,7 +59,7 @@ namespace DeBruijn
             bwl = new BinaryWriter(fsl);
             //local_lnodes = new List<LNode>();
         }
-        public int GetSetNode(UInt64 bword)
+        public int GetSetNode(BWord bword)
         {
             int code;
             if (!dic.TryGetValue(bword, out code))
@@ -68,11 +68,11 @@ namespace DeBruijn
                 dic.Add(bword, code);
                 local_wnodesCount++;
                 //local_wnodes.Add(new WNode() { bword = bword }); // Заполняются только слова узлов
-                bww.Write((UInt64)bword);
+                BWord.WriteBWord(bword, bww);
             }
             return code;
         }
-        public IEnumerable<int> GetSetNodes(IEnumerable<UInt64> bwords)
+        public IEnumerable<int> GetSetNodes(IEnumerable<BWord> bwords)
         {
             return bwords.Select(bw => GetSetNode(bw));
         }
@@ -132,11 +132,11 @@ namespace DeBruijn
             //local_wnodes = new List<WNode>();
             fsw.Position = 0L;
             long wcount = brw.ReadInt64();
-            local_wnodes = new WNode[wcount];
+            local_wnodes = new BWord[wcount];
             for (int i = 0; i < wcount; i++)
             {
-                UInt64 bword = brw.ReadUInt64();
-                local_wnodes[i].bword = bword;
+                BWord bword = BWord.ReadBWord(brw);
+                local_wnodes[i] = bword;
             }
         }
         public void RestoreInitLNodes()
@@ -163,7 +163,7 @@ namespace DeBruijn
             }
         }
 
-        public void DropDictionary() { dic = new Dictionary<ulong, int>(); }
+        public void DropDictionary() { dic = new Dictionary<BWord, int>(); }
 
         public void SetNodePrev(int local, int prevlink)
         {
@@ -196,7 +196,7 @@ namespace DeBruijn
             });
         }
 
-        public IEnumerable<WNode> GetWNodes(IEnumerable<int> codes)
+        public IEnumerable<BWord> GetWNodes(IEnumerable<int> codes)
         {
             return codes.Select(code =>
             {

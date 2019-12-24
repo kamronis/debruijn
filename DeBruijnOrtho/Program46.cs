@@ -60,7 +60,7 @@ namespace DeBruijn
                     .ToArray();
 
                     // Обратиться к хранилищу
-                    int[] codes = graph.GetSetNodes(bwords.Select(w => w.ToUInt64())).ToArray();
+                    int[] codes = graph.GetSetNodes(bwords).ToArray();
 
                     // Выполнить итоговые действия, в том числе, с использованием полученного массива кодов
                     int icode = 0;
@@ -108,7 +108,7 @@ namespace DeBruijn
                     int len = (int)breader.ReadInt64();
                     byte[] arr = breader.ReadBytes(len);
                     // Формируем поток слов
-                    int nwords = len - Options.nsymbols + 1;
+                    int nwords = len - BWord.nsymbols + 1;
 
                     //binw.Write((long)nwords);
                     group.Add(new object[] { 3, (long)nwords });
@@ -118,7 +118,7 @@ namespace DeBruijn
                         // Читаем, читаем, пишем
                         BWord bword; // = br.ReadUInt64();
                         //if (word != bword) throw new Exception("3423423");
-                        bword = new BWord(arr, nom, Options.nsymbols);
+                        bword = new BWord(arr, nom);
 
                         int code = -4;
                         if (lay > 0) code = binr.ReadInt32();

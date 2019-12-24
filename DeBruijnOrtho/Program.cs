@@ -39,7 +39,7 @@ namespace DeBruijn
         public static void MainMaster(string[] args)
         {
             int nclients = Options.nparts - 1;
-            Console.WriteLine($"Start MainMaster for {nclients} clients. K: {Options.nsymbols} nparts: {Options.nparts} npasses: {Options.npasses}");
+            Console.WriteLine($"Start MainMaster for {nclients} clients. K: {BWord.nsymbols} nparts: {Options.nparts} npasses: {Options.npasses}");
 
             // Сначала создадим сетевую конфигурацию
             ServerConnection sc = null;
