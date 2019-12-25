@@ -78,7 +78,7 @@ namespace DeBruijn
             for (int i = 0; i < arr.Length; i++)
             {
                 BWord bword = arr[i];
-                int ipart = bword.Lay; //(int)(bword & mask);
+                int ipart = (int)(bword.uword & (uint)mask); // bword.Lay; //???
                 wordsbysections[ipart].Add(bword);
             }
 
@@ -95,7 +95,8 @@ namespace DeBruijn
             for (int i = 0; i < arr.Length; i++)
             {
                 BWord bword = arr[i];
-                int ipart = bword.Lay; //(int)(bword & mask);
+                //int ipart = bword.Lay; //(int)(bword & mask);
+                int ipart = (int)(bword.uword & (uint)mask);
                 int localcode = codesbysections[ipart][nextind[ipart]];
                 nextind[ipart] += 1;
                 results[i] = (localcode << Options.nshift) | ipart;

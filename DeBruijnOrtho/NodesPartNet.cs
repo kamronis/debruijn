@@ -12,7 +12,7 @@ namespace DeBruijn
         public NodesPartNet(BinaryClient bclient) { this.bclient = bclient; }
         // Команды: 
 
-        public IEnumerable<int> GetSetNodes(IEnumerable<UInt64> bwords) // 1
+        public IEnumerable<int> GetSetNodes(IEnumerable<BWord> bwords) // 1
         {
             // Послать команду 1
             bclient.BWriter.Write((byte)1);
@@ -22,7 +22,7 @@ namespace DeBruijn
             // Послать массив длинных без знака
             for (int i = 0; i < arr.Length; i++)
             {
-                bclient.BWriter.Write((UInt64)arr[i]);
+                BWord.WriteBWord(arr[i], bclient.BWriter);
             }
             // Принять массив целых
             long n = bclient.BReader.ReadInt64();
@@ -163,9 +163,9 @@ namespace DeBruijn
             return warr;
         }
 
-        public IEnumerable<int> GetSetNodes(IEnumerable<BWord> bwords)
-        {
-            throw new NotImplementedException();
-        }
+        //public IEnumerable<int> GetSetNodes(IEnumerable<BWord> bwords)
+        //{
+        //    throw new NotImplementedException();
+        //}
     }
 }
