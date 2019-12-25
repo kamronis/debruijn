@@ -38,6 +38,7 @@ namespace DeBruijn
             for (lay = 0; lay < Options.npasses; lay++)
             {
                 Console.Write($"pass {lay} ");
+                long laycount = 0;
                 // Перемотаем на начало бинарный рид 
                 bytereadstream.Position = 0L;
 
@@ -124,6 +125,7 @@ namespace DeBruijn
                         if (lay > 0) code = binr.ReadInt32();
                         if (bword.Lay == lay)
                         {
+                            laycount++;
                             //code = graph.GetSetNode(bword);
                             //binw.Write(code);
                             group.Add(new object[] { 1, bword });
@@ -140,7 +142,7 @@ namespace DeBruijn
                 // Пошлем команду на освобождение словаря
                 graph.DropDictionary();
                 GC.Collect();
-                Console.WriteLine();
+                Console.WriteLine($"laycount: {laycount/1000000L} mln.");
             }
             fs0.Close(); fs1.Close();
             string lastfname = (lay & 1) == 0 ? tmp0 : tmp1;

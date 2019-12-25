@@ -41,7 +41,16 @@ namespace DeBruijn
 #endif
         }
         //public UInt64 ToUInt64() { return uword; }
-        public int Lay { get { return (int)((uword >> Options.nshift) & (ulong)(Options.nparts - 1)); } }
+        public int Lay
+        {
+            get
+            {
+                var a1 = uword >> Options.nshift;
+                var a2 = a1 & 3;
+                //return (int)((uword >> Options.nshift) & (ulong)(Options.nparts - 1));
+                return (int)((uword >> Options.nshift) & (ulong)(Options.npasses - 1));
+            }
+        }
         public static BWord ReadBWord(BinaryReader reader)
         {
             var uw = reader.ReadUInt64();

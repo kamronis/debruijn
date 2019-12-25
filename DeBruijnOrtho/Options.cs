@@ -9,8 +9,8 @@ namespace DeBruijn
         public static string masterfileplace = @"D:\Home\data\deBruijn\";
         //public static string masterfileplace = @"D:\PROJECTS\DeBrein\";
         public static string clientfileplace = @"D:\Home\data\deBruijn\";
-        public static string readsfilename = masterfileplace + "reads.txt";
-        //public static string readsfilename = masterfileplace + "Gen_reads.txt";
+        //public static string readsfilename = masterfileplace + "reads.txt";
+        public static string readsfilename = masterfileplace + "Gen_reads.txt";
         //public static string readsfilename = masterfileplace + "50mil_reads.txt";
         public static string breadsfilename = masterfileplace + "breads.bin"; // Уже не нужен
         public static string bytereadsfilename = masterfileplace + "bytereads.bin";
@@ -25,7 +25,7 @@ namespace DeBruijn
 
         //public static int nsymbols = 20; // Константа перенесена в BWord.cs 
         public static int nparts = 1; // должна быть степень двойки
-        public static int npasses = 2; // Число проходов при кодировании слов (Program44)
+        public static int npasses = 4; // Число проходов при кодировании слов (Program44)
         public static int readslimit = Int32.MaxValue; // Пределньный пропуск количества ридов
 
         public static string host = "127.0.0.1"; // IP компьютера, на котором располагается мастер
