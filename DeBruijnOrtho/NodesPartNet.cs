@@ -57,21 +57,19 @@ namespace DeBruijn
         {
             bclient.BWriter.Write((byte)6);
         }
-        public void SetNodePrev(int local, int prevlink) // 7
+        public void SetNodePrev(int local, NCode prevlink) // 7
         {
             bclient.BWriter.Write((byte)7);
             bclient.BWriter.Write(local);
-            bclient.BWriter.Write(prevlink);
-            //byte r = bclient.BReader.ReadByte();
-            //if (r != 77) throw new Exception("Error 77: r=" + r);
+            //bclient.BWriter.Write(prevlink);
+            NCode.Write(prevlink, bclient.BWriter);
         }
-        public void SetNodeNext(int local, int nextlink) // 8
+        public void SetNodeNext(int local, NCode nextlink) // 8
         {
             bclient.BWriter.Write((byte)8);
             bclient.BWriter.Write(local);
-            bclient.BWriter.Write(nextlink);
-            //byte r = bclient.BReader.ReadByte();
-            //if (r != 78) throw new Exception("Error 78: r=" + r);
+            //bclient.BWriter.Write(nextlink);
+            NCode.Write(nextlink, bclient.BWriter);
         }
 
         public void Save() // 9
@@ -83,15 +81,17 @@ namespace DeBruijn
         {
             bclient.BWriter.Write((byte)10);
             bclient.BWriter.Write(nom);
-            int prev = bclient.BReader.ReadInt32();
-            int next = bclient.BReader.ReadInt32();
+            //int prev = bclient.BReader.ReadInt32();
+            //int next = bclient.BReader.ReadInt32();
+            NCode prev = NCode.Read(bclient.BReader);
+            NCode next = NCode.Read(bclient.BReader);
             return new LNode() { prev = prev, next = next };
         }
 
-        public IEnumerable<LNode> GetNodes(IEnumerable<int> codes) // 11
+        public IEnumerable<LNode> GetNodes(IEnumerable<int> localcodes) // 11
         {
             bclient.BWriter.Write((byte)11);
-            int[] arr = codes.ToArray();
+            int[] arr = localcodes.ToArray();
             // Посылаем
             bclient.BWriter.Write((long)arr.Length);
             for (int i = 0; i< arr.Length; i++)
@@ -104,8 +104,10 @@ namespace DeBruijn
             LNode[] carr = new LNode[nres];
             for (int i = 0; i< nres; i++)
             {
-                int prev = bclient.BReader.ReadInt32();
-                int next = bclient.BReader.ReadInt32();
+                //int prev = bclient.BReader.ReadInt32();
+                //int next = bclient.BReader.ReadInt32();
+                NCode prev = NCode.Read(bclient.BReader);
+                NCode next = NCode.Read(bclient.BReader);
                 carr[i] = new LNode() { prev = prev, next = next };
             }
             return carr;
@@ -141,10 +143,10 @@ namespace DeBruijn
             bclient.BWriter.Write((byte)17);
         }
 
-        public IEnumerable<BWord> GetWNodes(IEnumerable<int> codes) // 17
+        public IEnumerable<BWord> GetWNodes(IEnumerable<int> localcodes) // 17
         {
             bclient.BWriter.Write((byte)18);
-            int[] arr = codes.ToArray();
+            int[] arr = localcodes.ToArray();
             // Посылаем
             bclient.BWriter.Write((long)arr.Length);
             for (int i = 0; i < arr.Length; i++)

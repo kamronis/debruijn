@@ -32,7 +32,7 @@ namespace DeBruijn
                 // Поиск узлов начал цепочек
                 List<LNode> startpoints = new List<LNode>();
                 // Накопитель
-                List<int> codes = new List<int>();
+                List<NCode> codes = new List<NCode>();
                 for (int n = 0; n < nodescount; n++) // n - локальный код
                 {
                     // Основная идея в том, что цепочка может начинаться ТОЛЬКО с узла у которого нет предыдущего или 
@@ -40,23 +40,27 @@ namespace DeBruijn
                     // Кроме того, нет смысла рассматривать те узлы, у которых не единственный следующий.
 
                     if (n % 100_000_000 == 0) Console.Write($"{n / 100_000_000} ");
-                    codes.Add(graph.ConstructCode(ipart, n));
+                    //codes.Add(graph.ConstructCode(ipart, n));
+                    codes.Add(NCode.Construct(ipart, n));
                     if (codes.Count >= Options.buffcnodeslength)
                     {
                         LNode[] nodes = graph.GetNodes(codes).ToArray();
                         // Множество узлов у которых есть следующий и нет предыдущего - эти все годятся как начальные узлы
                         IEnumerable<LNode> nset1 = nodes
-                            .Where(nd => nd.next >= 0 && nd.prev < 0);
+                            //.Where(nd => nd.next >= 0 && nd.prev < 0);
+                            .Where(nd => nd.next.IsSingle() && !nd.prev.IsSingle());
                         // Множество узлов у которых есть следующий и есть предыдущий, его надо дополнительно проверить.
                         LNode[] nset2 = nodes
-                            .Where(nd => nd.next >= 0 && nd.prev >= 0).ToArray();
+                            //.Where(nd => nd.next >= 0 && nd.prev >= 0).ToArray();
+                            .Where(nd => nd.next.IsSingle() && nd.prev.IsSingle()).ToArray();
                         // Для проверки формируем множество кодов предыдущих узлов
-                        IEnumerable<int> cset = nset2.Select(nd => nd.prev);
+                        IEnumerable<NCode> cset = nset2.Select(nd => nd.prev);
                         // Находим по нему узлы, формируем массив
                         LNode[] nset3 = graph.GetNodes(cset).ToArray(); // элементы nset3 позиционно соответствуют nset2
                         startpoints.AddRange(nset1);
-                        startpoints.AddRange(nset2.Where((nd, ind) => nset3[ind].next < 0));
-                        codes = new List<int>();
+                        //startpoints.AddRange(nset2.Where((nd, ind) => nset3[ind].next < 0));
+                        startpoints.AddRange(nset2.Where((nd, ind) => !nset3[ind].next.IsSingle()));
+                        codes = new List<NCode>();
                     }
                 }
                 Console.WriteLine();
@@ -65,17 +69,20 @@ namespace DeBruijn
                     LNode[] nodes = graph.GetNodes(codes).ToArray();
                     // Множество узлов у которых есть следующий и нет предыдущего - эти все годятся как начальные узлы
                     IEnumerable<LNode> nset1 = nodes
-                        .Where(nd => nd.next >= 0 && nd.prev < 0);
+                        //.Where(nd => nd.next >= 0 && nd.prev < 0);
+                        .Where(nd => nd.next.IsSingle() && !nd.prev.IsSingle());
                     // Множество узлов у которых есть следующий и есть предыдущий, его надо дополнительно проверить.
                     LNode[] nset2 = nodes
-                        .Where(nd => nd.next >= 0 && nd.prev >= 0).ToArray();
+                        //.Where(nd => nd.next >= 0 && nd.prev >= 0).ToArray();
+                        .Where(nd => nd.next.IsSingle() && nd.prev.IsSingle()).ToArray();
                     // Для проверки формируем множество кодов предыдущих узлов
-                    IEnumerable<int> cset = nset2.Select(nd => nd.prev);
+                    IEnumerable<NCode> cset = nset2.Select(nd => nd.prev);
                     // Находим по нему узлы, формируем массив
                     LNode[] nset3 = graph.GetNodes(cset).ToArray(); // элементы nset3 позиционно соответствуют nset2
                     startpoints.AddRange(nset1);
-                    startpoints.AddRange(nset2.Where((nd, ind) => nset3[ind].next < 0));
-                    codes = new List<int>();
+                    //startpoints.AddRange(nset2.Where((nd, ind) => nset3[ind].next < 0));
+                    startpoints.AddRange(nset2.Where((nd, ind) => !nset3[ind].next.IsSingle()));
+                    codes = new List<NCode>();
                 }
                 Console.WriteLine();
                 Console.WriteLine($"chains: {startpoints.Count}");
@@ -88,13 +95,13 @@ namespace DeBruijn
                 {
                     LNode nd = startpoints[ind];
                     // Добавляем еще одну цепочку если у узла есть следующий
-                    if (nd.next >= 0) chains.Add(new List<LNode>(new LNode[] { nd }));
+                    if (nd.next.IsSingle()) chains.Add(new List<LNode>(new LNode[] { nd }));
                     // Возможны варианты: мало цепочек или много цепочек
                     // Будем удлинять и выбраковывать цепочки пока их не станет мало
                     while (chains.Count > limit || (ind == startpoints.Count - 1 && chains.Count > 0))
                     {
                         // текущий вектор кодов узлов
-                        IEnumerable<int> next_codes = chains.Select(li => li[li.Count - 1].next);
+                        IEnumerable<NCode> next_codes = chains.Select(li => li[li.Count - 1].next);
                         // массив следующих узлов
                         LNode[] next = graph.GetNodes(next_codes).ToArray();
                         // Выбраковывание и формирование нового списка
@@ -107,13 +114,13 @@ namespace DeBruijn
                             // последний элемент ndd цепочки обладает свойствами: ndd.next >= 0 (иначе нельзя удлинить)
 
                             // Кандидат может не подойти если nd_candidate.prev < 0. тогда выводим список из оборота
-                            if (nd_candidate.prev < 0) { nchains++; if (chain.Count > maxlist.Length) maxlist = chain.ToArray(); continue; }
+                            if (!nd_candidate.prev.IsSingle()) { nchains++; if (chain.Count > maxlist.Length) maxlist = chain.ToArray(); continue; }
 
                             // кандидат подошел.
                             chain.Add(nd_candidate);
 
                             //Он может быть последним в цепочке если у него нет следующего, тогда мыцепочку выводим из оборота
-                            if (nd_candidate.next < 0) { nchains++; if (chain.Count > maxlist.Length) maxlist = chain.ToArray(); continue; }
+                            if (!nd_candidate.next.IsSingle()) { nchains++; if (chain.Count > maxlist.Length) maxlist = chain.ToArray(); continue; }
 
                             // Добавляем в новый список
                             chains_next.Add(chain);
@@ -129,7 +136,7 @@ namespace DeBruijn
             // В цепочке (надеюсь) больше 1 элемента, определяем код нулевого узла по первому, далее строим список кодов всех узлов
             if (Options.toprintcontig)
             {
-                List<int> maxcodes = new List<int>();
+                List<NCode> maxcodes = new List<NCode>();
                 maxcodes.Add(maxlist[1].prev);
                 for (int i = 0; i < maxlist.Length - 1; i++)
                 {

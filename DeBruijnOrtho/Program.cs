@@ -33,6 +33,7 @@ namespace DeBruijn
             {
                 if (args[0] == "master") MainMaster(args);
                 else if (args[0] == "client") MainClient(args);
+                //else if (args[0] == "mono") MainMono();
                 else throw new Exception("Error: wrong Main args");
             }
         }

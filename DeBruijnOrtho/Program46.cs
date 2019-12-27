@@ -61,7 +61,7 @@ namespace DeBruijn
                     .ToArray();
 
                     // Обратиться к хранилищу
-                    int[] codes = graph.GetSetNodes(bwords).ToArray();
+                    NCode[] codes = graph.GetSetNodes(bwords).ToArray();
 
                     // Выполнить итоговые действия, в том числе, с использованием полученного массива кодов
                     int icode = 0;
@@ -72,14 +72,14 @@ namespace DeBruijn
                         {
                             case 1:
                                 {
-                                    int _code = codes[icode]; icode++;
-                                    binw.Write(_code);
+                                    NCode _code = codes[icode]; icode++;
+                                    NCode.Write(_code, binw);
                                     break;
                                 }
                             case 2:
                                 {
-                                    int _code = (int)pars[1];
-                                    binw.Write(_code);
+                                    NCode _code = (NCode)pars[1];
+                                    NCode.Write(_code, binw);
                                     break;
                                 }
                             case 3:
@@ -118,11 +118,10 @@ namespace DeBruijn
                     {
                         // Читаем, читаем, пишем
                         BWord bword; // = br.ReadUInt64();
-                        //if (word != bword) throw new Exception("3423423");
                         bword = new BWord(arr, nom);
 
-                        int code = -4;
-                        if (lay > 0) code = binr.ReadInt32();
+                        NCode code = new NCode(-4);
+                        if (lay > 0) code = NCode.Read(binr);
                         if (bword.Lay == lay)
                         {
                             laycount++;

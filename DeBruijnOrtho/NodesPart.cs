@@ -61,16 +61,16 @@ namespace DeBruijn
         }
         public int GetSetNode(BWord bword)
         {
-            int code;
-            if (!dic.TryGetValue(bword, out code))
+            int localcode;
+            if (!dic.TryGetValue(bword, out localcode))
             {
-                code = local_wnodesCount;
-                dic.Add(bword, code);
+                localcode = local_wnodesCount;
+                dic.Add(bword, localcode);
                 local_wnodesCount++;
                 //local_wnodes.Add(new WNode() { bword = bword }); // Заполняются только слова узлов
                 BWord.WriteBWord(bword, bww);
             }
-            return code;
+            return localcode;
         }
         public IEnumerable<int> GetSetNodes(IEnumerable<BWord> bwords)
         {
@@ -121,8 +121,8 @@ namespace DeBruijn
                 for (int i = 0; i < lcount; i++)
                 {
                     var node = local_lnodes[i];
-                    bwl.Write(node.prev);
-                    bwl.Write(node.next);
+                    NCode.Write(node.prev, bwl);
+                    NCode.Write(node.next, bwl);
                 }
                 fsl.Close();
             }
@@ -144,8 +144,10 @@ namespace DeBruijn
             local_lnodes = new LNode[local_wnodesCount];
             for (int i = 0; i< local_wnodesCount; i++)
             {
-                local_lnodes[i].prev = -1;
-                local_lnodes[i].next = -1;
+                //local_lnodes[i].prev = -1;
+                //local_lnodes[i].next = -1;
+                local_lnodes[i].prev = NCode.none;
+                local_lnodes[i].next = NCode.none;
             }
         }
         public void RestoreDeactivateWNodes() { local_wnodes = null; } 
@@ -156,8 +158,8 @@ namespace DeBruijn
             local_lnodes = new LNode[(int)lcount];
             for (int i = 0; i < lcount; i++)
             {
-                int prev = brl.ReadInt32();
-                int next = brl.ReadInt32();
+                NCode prev = NCode.Read(brl);
+                NCode next = NCode.Read(brl);
                 local_lnodes[i].prev = prev;
                 local_lnodes[i].next = next;
             }
@@ -165,42 +167,42 @@ namespace DeBruijn
 
         public void DropDictionary() { dic = new Dictionary<BWord, int>(); }
 
-        public void SetNodePrev(int local, int prevlink)
+        public void SetNodePrev(int local, NCode prevlink)
         {
             int node_nom = local;
-            var dnode = local_lnodes[node_nom];
-            if (dnode.prev == -1) { dnode.prev = prevlink; }
-            else if (dnode.prev == prevlink) { }
-            else if (dnode.prev == -2) { }
-            else { dnode.prev = -2; }
+            LNode dnode = local_lnodes[node_nom];
+            if (dnode.prev.Eq(NCode.none)) { dnode.prev = prevlink; }
+            else if (dnode.prev.Eq(prevlink)) { }
+            else if (dnode.prev.Eq(NCode.many)) { }
+            else { dnode.prev = NCode.many; }
             local_lnodes[node_nom] = dnode;
         }
-        public void SetNodeNext(int local, int nextlink)
+        public void SetNodeNext(int local, NCode nextlink)
         {
             int node_nom = local;
             var dnode = local_lnodes[node_nom];
-            if (dnode.next == -1) { dnode.next = nextlink; }
-            else if (dnode.next == nextlink) { }
-            else if (dnode.next == -2) { }
-            else { dnode.next = -2; }
+            if (dnode.next.Eq(NCode.none)) { dnode.next = nextlink; }
+            else if (dnode.next.Eq(nextlink)) { }
+            else if (dnode.next.Eq(NCode.many)) { }
+            else { dnode.next = NCode.many; }
             local_lnodes[node_nom] = dnode;
         }
 
-        public IEnumerable<LNode> GetNodes(IEnumerable<int> codes)
+        public IEnumerable<LNode> GetNodes(IEnumerable<int> localcodes)
         {
-            return codes.Select(code =>
+            return localcodes.Select(code =>
             {
-                int node_nom = code >> Options.nshift;
+                int node_nom = code; //code >> Options.nshift;
                 var dnode = local_lnodes[node_nom];
                 return dnode;
             });
         }
 
-        public IEnumerable<BWord> GetWNodes(IEnumerable<int> codes)
+        public IEnumerable<BWord> GetWNodes(IEnumerable<int> localcodes)
         {
-            return codes.Select(code =>
+            return localcodes.Select(code =>
             {
-                int node_nom = code >> Options.nshift;
+                int node_nom = code; //code >> Options.nshift;
                 var wnode = local_wnodes[node_nom];
                 return wnode;
             });

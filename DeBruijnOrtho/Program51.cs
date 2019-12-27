@@ -27,10 +27,10 @@ namespace DeBruijn
                 if (ind % 1000_000 == 0) Console.Write($"{ind / 1000_000} ");
                 // читаем длину бинарного рида
                 int nwords = (int)br.ReadInt64();
-                int codeprev = -1;
+                NCode codeprev = new NCode(-1);
                 for (int nom = 0; nom < nwords; nom++)
                 {
-                    int code = br.ReadInt32();
+                    NCode code = NCode.Read(br);
                     if (nom != 0) // точно есть текущий и предыдущий узлы
                     {
                         graph.SetNodePrev(code, codeprev);

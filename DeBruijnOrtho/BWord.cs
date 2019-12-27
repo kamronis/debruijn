@@ -40,15 +40,18 @@ namespace DeBruijn
             throw new Exception();
 #endif
         }
-        //public UInt64 ToUInt64() { return uword; }
         public int Lay
         {
             get
             {
-                var a1 = uword >> Options.nshift;
-                var a2 = a1 & 3;
-                //return (int)((uword >> Options.nshift) & (ulong)(Options.nparts - 1));
                 return (int)((uword >> Options.nshift) & (ulong)(Options.npasses - 1));
+            }
+        }
+        public int Part
+        {
+            get
+            {
+                return (int)(uword & (ulong)(Options.nparts - 1));
             }
         }
         public static BWord ReadBWord(BinaryReader reader)
@@ -136,7 +139,7 @@ namespace DeBruijn
     }
     public struct LNode
     {
-        public int prev;
-        public int next;
+        public NCode prev;
+        public NCode next;
     }
 }
