@@ -12,7 +12,7 @@ namespace DeBruijn
         public NodesPartNet(BinaryClient bclient) { this.bclient = bclient; }
         // Команды: 
 
-        public IEnumerable<int> GetSetNodes(IEnumerable<ulong> bwords) // 1
+        public IEnumerable<int> GetSetNodes(IEnumerable<BWord> bwords) // 1
         {
             // Послать команду 1
             bclient.BWriter.Write((byte)1);
@@ -22,7 +22,7 @@ namespace DeBruijn
             // Послать массив длинных без знака
             for (int i = 0; i < arr.Length; i++)
             {
-                bclient.BWriter.Write((UInt64)arr[i]);
+                BWord.WriteBWord(arr[i], bclient.BWriter);
             }
             // Принять массив целых
             long n = bclient.BReader.ReadInt64();
@@ -57,21 +57,19 @@ namespace DeBruijn
         {
             bclient.BWriter.Write((byte)6);
         }
-        public void SetNodePrev(int local, int prevlink) // 7
+        public void SetNodePrev(int local, NCode prevlink) // 7
         {
             bclient.BWriter.Write((byte)7);
             bclient.BWriter.Write(local);
-            bclient.BWriter.Write(prevlink);
-            //byte r = bclient.BReader.ReadByte();
-            //if (r != 77) throw new Exception("Error 77: r=" + r);
+            //bclient.BWriter.Write(prevlink);
+            NCode.Write(prevlink, bclient.BWriter);
         }
-        public void SetNodeNext(int local, int nextlink) // 8
+        public void SetNodeNext(int local, NCode nextlink) // 8
         {
             bclient.BWriter.Write((byte)8);
             bclient.BWriter.Write(local);
-            bclient.BWriter.Write(nextlink);
-            //byte r = bclient.BReader.ReadByte();
-            //if (r != 78) throw new Exception("Error 78: r=" + r);
+            //bclient.BWriter.Write(nextlink);
+            NCode.Write(nextlink, bclient.BWriter);
         }
 
         public void Save() // 9
@@ -83,15 +81,17 @@ namespace DeBruijn
         {
             bclient.BWriter.Write((byte)10);
             bclient.BWriter.Write(nom);
-            int prev = bclient.BReader.ReadInt32();
-            int next = bclient.BReader.ReadInt32();
+            //int prev = bclient.BReader.ReadInt32();
+            //int next = bclient.BReader.ReadInt32();
+            NCode prev = NCode.Read(bclient.BReader);
+            NCode next = NCode.Read(bclient.BReader);
             return new LNode() { prev = prev, next = next };
         }
 
-        public IEnumerable<LNode> GetNodes(IEnumerable<int> codes) // 11
+        public IEnumerable<LNode> GetNodes(IEnumerable<int> localcodes) // 11
         {
             bclient.BWriter.Write((byte)11);
-            int[] arr = codes.ToArray();
+            int[] arr = localcodes.ToArray();
             // Посылаем
             bclient.BWriter.Write((long)arr.Length);
             for (int i = 0; i< arr.Length; i++)
@@ -104,9 +104,10 @@ namespace DeBruijn
             LNode[] carr = new LNode[nres];
             for (int i = 0; i< nres; i++)
             {
-                //UInt64 bword = bclient.BReader.ReadUInt64();
-                int prev = bclient.BReader.ReadInt32();
-                int next = bclient.BReader.ReadInt32();
+                //int prev = bclient.BReader.ReadInt32();
+                //int next = bclient.BReader.ReadInt32();
+                NCode prev = NCode.Read(bclient.BReader);
+                NCode next = NCode.Read(bclient.BReader);
                 carr[i] = new LNode() { prev = prev, next = next };
             }
             return carr;
@@ -117,7 +118,7 @@ namespace DeBruijn
             bclient.BWriter.Write(firsttime);
         }
 
-        public int GetSetNode(ulong bword) // 13
+        public int GetSetNode(BWord bword) // 13
         {
             throw new NotImplementedException();
         }
@@ -142,10 +143,10 @@ namespace DeBruijn
             bclient.BWriter.Write((byte)17);
         }
 
-        public IEnumerable<WNode> GetWNodes(IEnumerable<int> codes) // 17
+        public IEnumerable<BWord> GetWNodes(IEnumerable<int> localcodes) // 17
         {
             bclient.BWriter.Write((byte)18);
-            int[] arr = codes.ToArray();
+            int[] arr = localcodes.ToArray();
             // Посылаем
             bclient.BWriter.Write((long)arr.Length);
             for (int i = 0; i < arr.Length; i++)
@@ -155,13 +156,18 @@ namespace DeBruijn
             // Принимаем
             int nres = (int)bclient.BReader.ReadInt64();
             if (nres != arr.Length) throw new Exception("2929334");
-            WNode[] warr = new WNode[nres];
+            BWord[] warr = new BWord[nres];
             for (int i = 0; i < nres; i++)
             {
-                UInt64 bword = bclient.BReader.ReadUInt64();
-                warr[i] = new WNode() { bword = bword };
+                BWord bword = BWord.ReadBWord(bclient.BReader); //bclient.BReader.ReadUInt64();
+                warr[i] = bword; //new WNode() { bword = bword.ToUInt64() };
             }
             return warr;
         }
+
+        //public IEnumerable<int> GetSetNodes(IEnumerable<BWord> bwords)
+        //{
+        //    throw new NotImplementedException();
+        //}
     }
 }

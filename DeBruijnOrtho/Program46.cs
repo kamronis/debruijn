@@ -38,6 +38,7 @@ namespace DeBruijn
             for (lay = 0; lay < Options.npasses; lay++)
             {
                 Console.Write($"pass {lay} ");
+                long laycount = 0;
                 // Перемотаем на начало бинарный рид 
                 bytereadstream.Position = 0L;
 
@@ -60,7 +61,7 @@ namespace DeBruijn
                     .ToArray();
 
                     // Обратиться к хранилищу
-                    int[] codes = graph.GetSetNodes(bwords.Select(w => w.ToUInt64())).ToArray();
+                    NCode[] codes = graph.GetSetNodes(bwords).ToArray();
 
                     // Выполнить итоговые действия, в том числе, с использованием полученного массива кодов
                     int icode = 0;
@@ -71,14 +72,14 @@ namespace DeBruijn
                         {
                             case 1:
                                 {
-                                    int _code = codes[icode]; icode++;
-                                    binw.Write(_code);
+                                    NCode _code = codes[icode]; icode++;
+                                    NCode.Write(_code, binw);
                                     break;
                                 }
                             case 2:
                                 {
-                                    int _code = (int)pars[1];
-                                    binw.Write(_code);
+                                    NCode _code = (NCode)pars[1];
+                                    NCode.Write(_code, binw);
                                     break;
                                 }
                             case 3:
@@ -108,7 +109,7 @@ namespace DeBruijn
                     int len = (int)breader.ReadInt64();
                     byte[] arr = breader.ReadBytes(len);
                     // Формируем поток слов
-                    int nwords = len - Options.nsymbols + 1;
+                    int nwords = len - BWord.nsymbols + 1;
 
                     //binw.Write((long)nwords);
                     group.Add(new object[] { 3, (long)nwords });
@@ -117,13 +118,13 @@ namespace DeBruijn
                     {
                         // Читаем, читаем, пишем
                         BWord bword; // = br.ReadUInt64();
-                        //if (word != bword) throw new Exception("3423423");
-                        bword = new BWord(arr, nom, Options.nsymbols);
+                        bword = new BWord(arr, nom);
 
-                        int code = -4;
-                        if (lay > 0) code = binr.ReadInt32();
+                        NCode code = new NCode(-4);
+                        if (lay > 0) code = NCode.Read(binr);
                         if (bword.Lay == lay)
                         {
+                            laycount++;
                             //code = graph.GetSetNode(bword);
                             //binw.Write(code);
                             group.Add(new object[] { 1, bword });
@@ -140,7 +141,7 @@ namespace DeBruijn
                 // Пошлем команду на освобождение словаря
                 graph.DropDictionary();
                 GC.Collect();
-                Console.WriteLine();
+                Console.WriteLine($"laycount: {laycount/1000000L} mln.");
             }
             fs0.Close(); fs1.Close();
             string lastfname = (lay & 1) == 0 ? tmp0 : tmp1;

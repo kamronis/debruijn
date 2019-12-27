@@ -35,10 +35,10 @@ namespace DeBruijn
             {
                 // Читаем длину, создаем вектор, читаем вектор
                 long len = br.ReadInt64();
-                UInt64[] arr = new UInt64[len];
+                BWord[] arr = new BWord[len];
                 for (int i = 0; i < len; i++)
                 {
-                    arr[i] = br.ReadUInt64();
+                    arr[i] = BWord.ReadBWord(br);
                 }
                 // Выполним команду
                 var result = storage.GetSetNodes(arr);
@@ -60,43 +60,41 @@ namespace DeBruijn
             //else if (comm == 6) { storage.Restore(); }
             else if (comm == 7)
             {
-                int node = br.ReadInt32();
-                int prev = br.ReadInt32();
-                storage.SetNodePrev(node, prev);
-                //bw.Write((byte)77);
+                int localnode = br.ReadInt32();
+                NCode prev = NCode.Read(br);
+                storage.SetNodePrev(localnode, prev);
             }
             else if (comm == 8)
             {
-                int node = br.ReadInt32();
-                int next = br.ReadInt32();
-                storage.SetNodeNext(node, next);
-                //bw.Write((byte)78);
+                int localnode = br.ReadInt32();
+                NCode next = NCode.Read(br); //br.ReadInt32();
+                storage.SetNodeNext(localnode, next);
             }
             else if (comm == 9) { storage.Save(); }
             else if (comm == 10)
             {
                 int nom = br.ReadInt32();
                 LNode lnode = storage.GetLNodeLocal(nom);
-                bw.Write(lnode.prev);
-                bw.Write(lnode.next);
+                NCode.Write(lnode.prev, bw);
+                //bw.Write(lnode.next);
+                NCode.Write(lnode.next, bw);
             }
             else if (comm == 11)
             {
                 long nargs = br.ReadInt64();
-                int[] codes = new int[nargs];
+                int[] localcodes = new int[nargs];
                 for (int i = 0; i< nargs; i++)
                 {
-                    codes[i] = br.ReadInt32();
+                    localcodes[i] = br.ReadInt32();
                 }
-                LNode[] resu = storage.GetNodes(codes).ToArray();
-                if (resu.Length != codes.Length) throw new Exception("229848");
+                LNode[] resu = storage.GetNodes(localcodes).ToArray();
+                if (resu.Length != localcodes.Length) throw new Exception("229848");
                 bw.Write((long)resu.Length);
                 for (int i = 0; i < nargs; i++)
                 {
                     LNode cnode = resu[i];
-                    //bw.Write(cnode.bword);
-                    bw.Write(cnode.prev);
-                    bw.Write(cnode.next);
+                    NCode.Write(cnode.prev, bw); //bw.Write(cnode.prev);
+                    NCode.Write(cnode.next, bw); //bw.Write(cnode.next);
                 }
             }
             else if (comm == 12) { bool firsttime = br.ReadBoolean(); storage.Init(firsttime); }
@@ -112,13 +110,13 @@ namespace DeBruijn
                 {
                     codes[i] = br.ReadInt32();
                 }
-                WNode[] resu = storage.GetWNodes(codes).ToArray();
+                BWord[] resu = storage.GetWNodes(codes).ToArray();
                 if (resu.Length != codes.Length) throw new Exception("229849");
                 bw.Write((long)resu.Length);
                 for (int i = 0; i < nargs; i++)
                 {
-                    WNode cnode = resu[i];
-                    bw.Write(cnode.bword);
+                    BWord cnode = resu[i];
+                    BWord.WriteBWord(cnode, bw);
                 }
             }
 
