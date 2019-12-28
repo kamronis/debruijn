@@ -25,15 +25,16 @@ namespace DeBruijn
 
             if (args.Length == 0)
             {
-                MainMaster(args);
+                //MainMaster(args);
                 //MainClient(new string[] { "client", @"D:\home\data\deBruijn\w2", @"D:\home\data\deBruijn\l2" });
                 //MainClient(new string[] { "client" });
+                MainMono();
             }
             else
             {
                 if (args[0] == "master") MainMaster(args);
                 else if (args[0] == "client") MainClient(args);
-                //else if (args[0] == "mono") MainMono();
+                else if (args[0] == "mono") MainMono();
                 else throw new Exception("Error: wrong Main args");
             }
         }
@@ -52,13 +53,6 @@ namespace DeBruijn
 
             if (sc != null)
             {
-                //// Проверяем клиентов тем, что пишем нулевую команду -- здесь ОШИБКА
-                //foreach (var c in sc.clients) { c.BWriter.Write((byte)0); }
-                ////sc.clients[0].BWriter.Write((byte)0);
-                //Console.WriteLine($"Master sent command 0 to client {0}");
-                //var result = sc.clients[0].BReader.ReadByte();
-                //Console.WriteLine($"Master received value {result} from client {0}");
-                ////sc.clients[0].BWriter.Write((byte)255);
             }
             sw = new System.Diagnostics.Stopwatch();
             graph = new DeBruGraph(sc)
@@ -101,6 +95,26 @@ namespace DeBruijn
                 bool ok = connection.ReceiveAndExecuteCommand();
                 if (!ok) break;
             }
+        }
+        public static void MainMono()
+        {
+            int nclients = Options.nparts - 1;
+            Console.WriteLine($"Start MainMono K: {BWord.nsymbols}, nparts: {Options.nparts}, npasses: {Options.npasses}");
+
+            sw = new System.Diagnostics.Stopwatch();
+            graph = new DeBruGraph(null)
+            {
+            };
+
+            DateTime tt0 = DateTime.Now;
+
+            Main31();
+            Main46();
+            Main51();
+            Main62();
+
+            DateTime tt1 = DateTime.Now;
+            Console.WriteLine($"Total time: {(tt1 - tt0).TotalMilliseconds} ms.");
         }
     }
 }

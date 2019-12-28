@@ -18,15 +18,27 @@ namespace DeBruijn
         public void InitParts(bool firsttime = false) 
         {
             parts = new INodePart[Options.nparts];
-            // Если число частей (степень двойки) совпадает с числом клиентов, то там части и располагаются, иначе нулевая часть помещается на мастере  
-            if (Options.nparts == Options.nslaves)
+            if (Options.mono)
             {
-                for (int i = 0; i < Options.nparts; i++) parts[i] = new NodesPartNet(sconnection.clients[i]);
+                for (int i = 0; i < Options.nparts; i++)
+                {
+                    string file_w = Options.masterfileplace + ("w" + i + ".bin");
+                    string file_l = Options.masterfileplace + ("l" + i + ".bin");
+                    parts[i] = new NodesPart(file_w, file_l);
+                }
             }
             else
             {
-                parts[0] = new NodesPart(Options.wnodesfilename, Options.lnodesfilename);
-                for (int i = 1; i < Options.nparts; i++) parts[i] = new NodesPartNet(sconnection.clients[i - 1]);
+                // Если число частей (степень двойки) совпадает с числом клиентов, то там части и располагаются, иначе нулевая часть помещается на мастере  
+                if (Options.nparts == Options.nslaves)
+                {
+                    for (int i = 0; i < Options.nparts; i++) parts[i] = new NodesPartNet(sconnection.clients[i]);
+                }
+                else
+                {
+                    parts[0] = new NodesPart(Options.wnodesfilename, Options.lnodesfilename);
+                    for (int i = 1; i < Options.nparts; i++) parts[i] = new NodesPartNet(sconnection.clients[i - 1]);
+                }
             }
 
             foreach (var part in parts) { part.Init(firsttime); }
@@ -204,10 +216,10 @@ namespace DeBruijn
         }
 
 
-        internal int ConstructCode(int part, int localcode)
-        {
-            return (localcode << Options.nshift) | part;
-        }
+        //internal int ConstructCode(int part, int localcode)
+        //{
+        //    return (localcode << Options.nshift) | part;
+        //}
 
     }
 }

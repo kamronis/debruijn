@@ -9,6 +9,7 @@ namespace DeBruijn
     public class NodesPart : INodePart
     {
         private Dictionary<BWord, int> dic = new Dictionary<BWord, int>();
+        //private SortedDictionary<BWord, int> dic = new SortedDictionary<BWord, int>();
 
         private string wnodesfilename;
         private FileStream fsw;
@@ -165,7 +166,12 @@ namespace DeBruijn
             }
         }
 
-        public void DropDictionary() { dic = new Dictionary<BWord, int>(); }
+        public void DropDictionary() 
+        {
+            Console.WriteLine($"IN DICTIONARY: {dic.Count} elements");
+            dic = new Dictionary<BWord, int>();
+            //dic = new SortedDictionary<BWord, int>();
+        }
 
         public void SetNodePrev(int local, NCode prevlink)
         {

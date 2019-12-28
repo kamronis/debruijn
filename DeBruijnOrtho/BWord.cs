@@ -8,7 +8,7 @@ using System.Text;
 
 namespace DeBruijn
 {
-    public struct BWord
+    public struct BWord : IComparable
     {
         public const int nsymbols = 55;
         public const string biochars = "ACGT";
@@ -135,6 +135,15 @@ namespace DeBruijn
             hash ^= (hash >> 11);
             hash += (hash << 15);
             return hash;
+        }
+
+        public int CompareTo(object obj)
+        {
+            int cmp = uword.CompareTo(((BWord)obj).uword);
+#if double
+            if (cmp == 0) cmp = uword2.CompareTo(((BWord)obj).uword2);
+#endif
+            return cmp;
         }
     }
     public struct LNode
