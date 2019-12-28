@@ -99,6 +99,7 @@ namespace DeBruijn
         public static void MainMono()
         {
             int nclients = Options.nparts - 1;
+            Options.mono = true;
             Console.WriteLine($"Start MainMono K: {BWord.nsymbols}, nparts: {Options.nparts}, npasses: {Options.npasses}");
 
             sw = new System.Diagnostics.Stopwatch();

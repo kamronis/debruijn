@@ -24,7 +24,6 @@ namespace DeBruijn
         // Эта часть опций должны вычисляться. Сейчас надо их задать!
 
         //public static int nsymbols = 20; // Константа перенесена в BWord.cs 
-        public static bool mono = true;
         public static int nparts = 4; // должна быть степень двойки
         public static int npasses = 2; // Число проходов при кодировании слов (Program44)
         public static int readslimit = Int32.MaxValue; // Пределньный пропуск количества ридов
@@ -40,5 +39,6 @@ namespace DeBruijn
         // Эти - вычисляются по nparts
         public static int nslaves;// nparts - 1; // Стандартном случае - на единицу меньше, чем число частей может и совпадать
         internal static int nshift; // смещение в коде для раздела частей и локальных номеров - число единичек в бинарном представлении nparts-1
+        internal static bool mono = false;
     }
 }
