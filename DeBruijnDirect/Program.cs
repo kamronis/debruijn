@@ -13,7 +13,7 @@ namespace DeBruijnDirect
         }
         static void Main1()
         {
-            Console.WriteLine($"Start DeBruijnDirect version 1.1, passes: {DirectOptions.npasses}, K: {DirectOptions.nsymbols}");
+            Console.WriteLine($"Start DeBruijnDirect version 1.1, passes: {DirectOptions.npasses}, sections: {DirectOptions.nsections} K: {DirectOptions.nsymbols}");
             System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
 
             // Данные читаются из файла, "слово" в n-граммном разбиении имеет длину nsymbols. 
@@ -32,7 +32,7 @@ namespace DeBruijnDirect
             // Преобразуем входной файл в бинарный
             bwriter.Write(0L); // резервируем
             string biochars = "ACGT";
-            int nreads = 0;
+            long nreads = 0;
             string line = null;
             while ((line = reader.ReadLine()) != null)
             {
@@ -56,7 +56,7 @@ namespace DeBruijnDirect
             bwriter.Write((long)nreads);
             bwriter.Flush();
 
-            Console.WriteLine("bytereads ok.");
+            Console.WriteLine($"bytereads ok. ###nreads={nreads}");
             reader.Close();
 
             // Две важнейших структуры и одна временная
@@ -178,6 +178,8 @@ namespace DeBruijnDirect
                 Console.WriteLine();
             }
 
+            long numberofnodes = 0L; for (int i = 0; i < nnods.Length; i++) numberofnodes += nnods[i]; 
+            Console.WriteLine($"###nodes total: {numberofnodes}");
             // Теперь нам нужны узлы со ссылками (номерами) prev и next
             PrevNext[][] lnodes = Enumerable.Range(0, nnods.Length).Select(i =>
             {
