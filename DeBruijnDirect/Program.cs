@@ -60,10 +60,25 @@ namespace DeBruijnDirect
             reader.Close();
 
             // Две важнейших структуры и одна временная
-            List<ulong> ccodes = new List<ulong>(); // не используется!!!
+            //List<ulong> ccodes = new List<ulong>(); // не используется!!!
 
-            Dictionary<ulong, int> dic = new Dictionary<ulong, int>();
-            int nnodes = 0;
+            // Словари
+            Dictionary<ulong, Code>[] dics = Enumerable.Range(0, DirectOptions.nsections)
+                .Select(i => new Dictionary<ulong, Code>()).ToArray();
+            // Накопленное количество узлов, разбитое по секциям
+            int[] nnods = Enumerable.Repeat<int>(0, DirectOptions.nsections).ToArray();
+
+            // Определяем ключевые функции
+            ulong pathmask = (ulong)(DirectOptions.npasses - 1);
+            int pm = DirectOptions.npasses - 1;
+            int pathshift = 0;
+            while (pm != 0) { pathshift++; pm = pm >> 1; }
+
+            Func<ulong, int> word2path = w => (int)(w & pathmask);
+
+            ulong secmask = (ulong)(DirectOptions.nsections - 1);
+            Func<ulong, int> word2sec = w => (int)((w >> pathshift) & secmask);
+
 
             // Файлы для накапливания кодированных ридов creads.bin
             string f1name = DirectOptions.workdir + "f1.bin";
@@ -75,7 +90,7 @@ namespace DeBruijnDirect
             BinaryReader br = new BinaryReader(streams[first % 2]);
             BinaryWriter bw = new BinaryWriter(streams[(first + 1) % 2]);
 
-            Action TogleFiles = () => 
+            Action TogleFiles = () =>
             {
                 f1.Position = 0L;
                 f2.Position = 0L;
@@ -88,7 +103,6 @@ namespace DeBruijnDirect
             for (int ipass = 0; ipass < DirectOptions.npasses; ipass++)
             {
                 Console.WriteLine($"pass {ipass}: ");
-                int nwords = 0;
                 filebytereads.Position = 0L;
                 long nnreads = breader.ReadInt64();
                 if (nnreads != nreads) throw new Exception("2234466");
@@ -103,19 +117,19 @@ namespace DeBruijnDirect
                     byte[] bread = breader.ReadBytes(len);
 
                     // создадим или прочитаем кодированный рид
-                    int[] reed = null;
+                    Code[] reed = null;
                     if (ipass == 0)
                     {
-                        reed = new int[len - DirectOptions.nsymbols + 1];
+                        reed = new Code[len - DirectOptions.nsymbols + 1];
                     }
                     else
                     {
                         int l_read = (int)br.ReadInt64();
-                        reed = new int[l_read];
+                        reed = new Code[l_read];
                         for (int i = 0; i < reed.Length; i++)
                         {
-                            int c = br.ReadInt32();
-                            reed[i] = c;
+                            var code = new Code(br);
+                            reed[i] = code;
                         }
                     }
 
@@ -128,41 +142,53 @@ namespace DeBruijnDirect
                             wd = (wd << 2) | bread[i + j];
                         }
                         ulong bword = wd;
+                        int inpath = word2path(bword);
+                        int insec = word2sec(bword);
 
                         // находим или создаем текущий узел
                         if ((int)(bword & (ulong)(DirectOptions.npasses - 1)) == ipass)
                         {
-                            int code;
-                            if (dic.TryGetValue(bword, out code)) { }
+                            Code code;
+                            if (dics[insec].TryGetValue(bword, out code)) { }
                             else
                             {
-                                code = nnodes;
-                                dic.Add(bword, code);
-                                nnodes++;
+                                code = new Code(insec, nnods[insec]);
+                                dics[insec].Add(bword, code);
+                                nnods[insec] += 1;
                             }
                             reed[i] = code;
                         }
                     }
                     // Запишем кодированный рид
                     bw.Write((long)reed.Length);
-                    for (int i = 0; i < reed.Length; i++) bw.Write(reed[i]);
+                    for (int i = 0; i < reed.Length; i++) reed[i].BinaryWrite(bw);
                 }
                 if (ipass == DirectOptions.npasses - 1)
                 {
                     Console.WriteLine($"memory used after dictionaries: {GC.GetTotalMemory(false)}");
-                    Console.WriteLine($"lines:{nreads} words: {nwords} codes: {nnodes} dictionary : {dic.Count} elements");
+                    //Console.WriteLine($"lines:{nreads} words: {nwords} codes: {nnodes} dictionary : {dic.Count} elements");
                 }
                 // Меняем файлы местами
                 TogleFiles();
                 // Теперь нам словарь не поднадобится
-                dic = new Dictionary<ulong, int>();
+                //dic = new Dictionary<ulong, int>();
+                dics = Enumerable.Range(0, DirectOptions.nsections)
+                    .Select(i => new Dictionary<ulong, Code>()).ToArray();
                 GC.Collect();
                 Console.WriteLine();
             }
 
             // Теперь нам нужны узлы со ссылками (номерами) prev и next
-            PrevNext[] lnodes = new PrevNext[nnodes];
-            for (int i=0; i<nnodes; i++) { lnodes[i].prev = -1; lnodes[i].next = -1; }
+            PrevNext[][] lnodes = Enumerable.Range(0, nnods.Length).Select(i =>
+            {
+                var pns = new PrevNext[nnods[i]];
+                for (int i1 = 0; i1 < pns.Length; i1++)
+                {
+                    pns[i1].prev = new Code(-1);
+                    pns[i1].next = new Code(-1);
+                }
+                return pns;
+            }).ToArray();
 
             // Сканируем новые кодированные риды
             long nr = br.ReadInt64();
@@ -172,25 +198,25 @@ namespace DeBruijnDirect
             {
                 if (nom % 1000000 == 0) Console.Write($"{nom / 1000000} ");
                 long nc = br.ReadInt64();
-                int[] cread = new int[nc];
+                Code[] cread = new Code[nc];
                 for (int j = 0; j < nc; j++)
                 {
-                    int c = br.ReadInt32();
+                    Code c = new Code(br);
                     cread[j] = c;
                 }
                 // код предыдущего узла
-                int previous = -1;
+                Code previous = new Code(-1);
                 for (int i = 0; i < cread.Length; i++)
                 {
                     // код текущего узла
-                    int current = cread[i];
-                    if (previous != -1)
+                    Code current = cread[i];
+                    if (!previous.Undefined)
                     {
                         // дуга добавляется если нет ничего, а разрушается если дуга (ссылка) есть и существующая ссылка другая 
-                        lnodes[current].prev = lnodes[current].prev == -1 ? previous : 
-                            (lnodes[current].prev == previous ? previous : -2);
-                        lnodes[previous].next = lnodes[previous].next == -1 ? current : 
-                            (lnodes[previous].next == current ? current : -2);
+                        lnodes[current.Sec][current.Nom].prev = lnodes[current.Sec][current.Nom].prev.Undefined ? previous : 
+                            (lnodes[current.Sec][current.Nom].prev.Value == previous.Value ? previous : new Code(-2));
+                        lnodes[previous.Sec][previous.Nom].next = lnodes[previous.Sec][previous.Nom].next.Undefined ? current : 
+                            (lnodes[previous.Sec][previous.Nom].next.Value == current.Value ? current : new Code(-2));
                     }
 
                     previous = current;
@@ -198,32 +224,37 @@ namespace DeBruijnDirect
             }
             Console.WriteLine();
 
-            // Выдача lnodes.bin для проверки
-            using (BinaryWriter w = new BinaryWriter(File.Open(DirectOptions.workdir + "lnodes_d.bin", FileMode.Create, FileAccess.Write)))
-            {
-                w.Write((long)lnodes.Length);
-                for (int i = 0; i < lnodes.Length; i++)
-                {
-                    w.Write(lnodes[i].prev);
-                    w.Write(lnodes[i].next);
-                }
-            }
+            //// Выдача lnodes.bin для проверки
+            //using (BinaryWriter w = new BinaryWriter(File.Open(DirectOptions.workdir + "lnodes_d.bin", FileMode.Create, FileAccess.Write)))
+            //{
+            //    w.Write((long)lnodes.Length);
+            //    for (int i = 0; i < lnodes.Length; i++)
+            //    {
+            //        //w.Write(lnodes[i].prev);
+            //        //w.Write(lnodes[i].next);
+            //    }
+            //}
 
             Console.WriteLine("Building chains");
             // Находим начала цепочек
             List<PrevNext> startpoints = new List<PrevNext>();
-            for (int n = 0; n < nnodes; n++) // n - номер, он же код узла
+            // Двойной цикл по узлам
+            for (int isec = 0; isec <nnods.Length; isec++)
             {
-                // Основная идея в том, что цепочка может начинаться ТОЛЬКО с узла у которого нет предыдущего или 
-                // предыдущих несколько или предыдущий один, но у него несколько следующих.
-                // Кроме того, нет смысла рассматривать те узлы, у которых не единственный следующий.
+                for (int nom = 0; nom < nnods[isec]; nom++) // n - номер, он же код узла
+                {
+                    // Основная идея в том, что цепочка может начинаться ТОЛЬКО с узла у которого нет предыдущего или 
+                    // предыдущих несколько или предыдущий один, но у него несколько следующих.
+                    // Кроме того, нет смысла рассматривать те узлы, у которых не единственный следующий.
 
-                var node = lnodes[n];
-                // Критерии принятия: (ссылка назад меньше нуля или ссылка назад есть но у того узла ссылки вперед нет) и есть ссылка вперед
-                if ((node.prev < 0 || lnodes[node.prev].next < 0) && node.next >= 0)
-                { startpoints.Add(node); } // принято
-                else // не принято
-                { }
+                    // Есть секция isec и номер узла в секции nom. Читаем узел
+                    var node = lnodes[isec][nom];
+                    // Критерии принятия: (ссылка назад меньше нуля или ссылка назад есть но у того узла ссылки вперед нет) и есть ссылка вперед
+                    if ((node.prev.Value < 0 || lnodes[node.prev.Sec][node.prev.Nom].next.Value < 0) && node.next.Value >= 0)
+                    { startpoints.Add(node); } // принято
+                    else // не принято
+                    { }
+                }
             }
             Console.WriteLine($"# startpoins: {startpoints.Count}");
 
@@ -236,11 +267,11 @@ namespace DeBruijnDirect
                 List<PrevNext> chain = new List<PrevNext>(new PrevNext[] { ndd });
                 while (true)
                 {
-                    PrevNext ndd_candidate = lnodes[ndd.next];
+                    PrevNext ndd_candidate = lnodes[ndd.next.Sec][ndd.next.Nom];
                     // Если кандидат не имеет предыдущего, то цепочка закончилась
-                    if (ndd_candidate.prev < 0) break;
+                    if (ndd_candidate.prev.Value < 0) break;
                     // Если кандидат не имеет следующего, то включить в цепочку и выйти
-                    if (ndd_candidate.next < 0)
+                    if (ndd_candidate.next.Value < 0)
                     {
                         chain.Add(ndd_candidate);
                         break;
