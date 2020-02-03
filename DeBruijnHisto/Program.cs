@@ -16,12 +16,13 @@ namespace DeBruijnHisto
 
             sw.Start(); // запускаем секундомер
 
-            // Сделаем байт-нарный файл ридов, его структура [[byte]] и бинарные ридер и райтер к нему
-            FileStream filebytereads = File.Open(HistoOptions.bytereadsfilename, FileMode.OpenOrCreate, FileAccess.ReadWrite);
-            BinaryReader breader = new BinaryReader(filebytereads);
+            // Входной файл ридов
+            FileStream filereads = File.Open(HistoOptions.readsfilename, FileMode.Open, FileAccess.Read);
+            TextReader reader = new StreamReader(filereads);
 
-            // Преобразуем входной файл в бинарный
-            //string biochars = "ACGT";
+            // Для преобразования входного файл в бинарный формат
+            string biochars = "ACGT";
+
             long nreads = 0;
             long numberofnodes = 0;
             int[] nodesrange = new int[24];
@@ -29,16 +30,24 @@ namespace DeBruijnHisto
             for (int ipass = 0; ipass < HistoOptions.npasses; ipass++)
             {
                 Console.WriteLine($"pass {ipass}: ");
-                filebytereads.Position = 0L;
-                nreads = breader.ReadInt64();
+                filereads.Position = 0L;
 
                 // Нам понадобится словарь
                 Dictionary<ulong, HistoInfo> hdic = new Dictionary<ulong, HistoInfo>();
 
-                for (int iline = 0; iline < nreads; iline++)
+                string line = null;
+                while ((line = reader.ReadLine()) != null)
                 {
-                    int len = (int)breader.ReadInt64();
-                    byte[] bread = breader.ReadBytes(len);
+                    int len = line.Length;
+                    byte[] bread = new byte[len];
+                    int ind = 0;
+                    foreach (char c in line)
+                    {
+                        int pos = biochars.IndexOf(c);
+                        if (pos == -1) pos = 3;
+                        bread[ind] = (byte)pos;
+                        ind++;
+                    }
 
                     // создадим кодированный рид
                     Word[] reed = null;

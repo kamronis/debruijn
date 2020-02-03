@@ -11,16 +11,17 @@ namespace DeBruijnTestGenerator
     {
         static void Main(string[] args)
         {
-            TextWriter line_twriter = new StreamWriter(File.Open(@"C:\data\DeBruijn\line.txt", FileMode.Create, FileAccess.Write)); //файл со строкой
-            TextWriter reads_twriter = new StreamWriter(File.Open(@"C:\data\DeBruijn\Gen_reads.txt", FileMode.Create, FileAccess.Write)); //файл с ридами
-            //TextWriter line_twriter = new StreamWriter(File.Open(@"D:\Home\data\DeBruijn\line.txt", FileMode.Create, FileAccess.Write)); //файл со строкой
-            //TextWriter reads_twriter = new StreamWriter(File.Open(@"D:\Home\data\DeBruijn\Gen_reads.txt", FileMode.Create, FileAccess.Write)); //файл с ридами
+            //TextWriter line_twriter = new StreamWriter(File.Open(@"C:\data\DeBruijn\line.txt", FileMode.Create, FileAccess.Write)); //файл со строкой
+            //TextWriter reads_twriter = new StreamWriter(File.Open(@"C:\data\DeBruijn\Gen_reads.txt", FileMode.Create, FileAccess.Write)); //файл с ридами
+            TextWriter line_twriter = new StreamWriter(File.Open(@"D:\Home\data\DeBruijn\line.txt", FileMode.Create, FileAccess.Write)); //файл со строкой
+            TextWriter reads_twriter = new StreamWriter(File.Open(@"D:\Home\data\DeBruijn\Gen_reads.txt", FileMode.Create, FileAccess.Write)); //файл с ридами
             long size = 10_000_000; //размер исходной строки
             int coverage = 10; // сколько раз полностью покрыть строку с помощью 100 символов
             long reads_count = (size / 100) * coverage; //количество ридов в результате
             string chars = "ACGT";
             char[] stringChars = new char[size];
             Random random = new Random(777777777);
+            Random rnd = new Random();
 
             for (long i = 0; i < stringChars.Length; i++) //генерация файла строки
             {
@@ -41,7 +42,10 @@ namespace DeBruijnTestGenerator
                     real_length++;
                     for (int j = 0; j < 100; j++)
                     {
-                        read += stringChars[position + j];
+                        char nxtchr = stringChars[position + j];
+                        // Имитация ошибки
+                        //if (rnd.Next(1000) < 1) nxtchr = chars[random.Next(chars.Length)];
+                        read += nxtchr;
                     }
                     reads_twriter.WriteLine(read);
                 }
