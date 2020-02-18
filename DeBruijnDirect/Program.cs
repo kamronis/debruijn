@@ -26,7 +26,7 @@ namespace DeBruijnDirect
 
             // Сделаем байт-нарный файл ридов, его структура [[byte]] и бинарные ридер и райтер к нему
             FileStream filebytereads = File.Open(DirectOptions.bytereadsfilename, FileMode.OpenOrCreate, FileAccess.ReadWrite);
-            FileStream filecompbytereads = File.Open(@"D:\PROJECTS\DeBrein\bytereads_compressed.bin", FileMode.OpenOrCreate, FileAccess.ReadWrite);
+            FileStream filecompbytereads = File.Open(DirectOptions.compressedreadsfilename, FileMode.OpenOrCreate, FileAccess.ReadWrite);
             BinaryWriter bwriter = new BinaryWriter(filebytereads);
             BinaryReader breader = new BinaryReader(filebytereads);
             BinaryReader bcompreader = new BinaryReader(filecompbytereads);
@@ -69,6 +69,7 @@ namespace DeBruijnDirect
                 .Select(i => new Dictionary<ulong, Code>()).ToArray();
             // Накопленное количество узлов, разбитое по секциям
             int[] nnods = Enumerable.Repeat<int>(0, DirectOptions.nsections).ToArray();
+            
 
             // Определяем ключевые функции
             ulong pathmask = (ulong)(DirectOptions.npasses - 1);
@@ -108,6 +109,7 @@ namespace DeBruijnDirect
                 Console.WriteLine($"pass {ipass}: ");
                 filebytereads.Position = 0L;
                 filecompbytereads.Position = 0L;
+                //bcompreader.
                 long nnreads = breader.ReadInt64();
                 long compnnreads = bcompreader.ReadInt64();
                 if (nnreads != compnnreads) throw new Exception("Err 1");
