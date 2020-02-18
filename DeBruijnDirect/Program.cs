@@ -26,8 +26,10 @@ namespace DeBruijnDirect
 
             // Сделаем байт-нарный файл ридов, его структура [[byte]] и бинарные ридер и райтер к нему
             FileStream filebytereads = File.Open(DirectOptions.bytereadsfilename, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+            FileStream filecompbytereads = File.Open(@"D:\PROJECTS\DeBrein\bytereads_compressed.bin", FileMode.OpenOrCreate, FileAccess.ReadWrite);
             BinaryWriter bwriter = new BinaryWriter(filebytereads);
             BinaryReader breader = new BinaryReader(filebytereads);
+            BinaryReader bcompreader = new BinaryReader(filecompbytereads);
 
             // Преобразуем входной файл в бинарный
             bwriter.Write(0L); // резервируем
@@ -102,9 +104,13 @@ namespace DeBruijnDirect
             // Сканируем данные, вычисляем узлы
             for (int ipass = 0; ipass < DirectOptions.npasses; ipass++)
             {
+                
                 Console.WriteLine($"pass {ipass}: ");
                 filebytereads.Position = 0L;
+                filecompbytereads.Position = 0L;
                 long nnreads = breader.ReadInt64();
+                long compnnreads = bcompreader.ReadInt64();
+                if (nnreads != compnnreads) throw new Exception("Err 1");
                 if (nnreads != nreads) throw new Exception("2234466");
 
                 // читаем и пишем число ридов в файлы
@@ -115,6 +121,23 @@ namespace DeBruijnDirect
                     if (iline % 1000_000 == 0) { /*Console.CursorLeft = 0;*/ Console.Write($"{(long)iline * 100L / (long)nreads}% "); }
                     int len = (int)breader.ReadInt64();
                     byte[] bread = breader.ReadBytes(len);
+
+                    int len1 = (int)bcompreader.ReadInt32();
+                    if (len1 != len) throw new Exception("Err 2");
+
+                    int comp_len = len1 / 4 + (len1 % 4 == 0 ? 0 : 1);
+
+                    byte[] bcompread = bcompreader.ReadBytes(comp_len);
+                    byte[] bread1 = new byte[len1];
+                    for (int i=0; i < bread1.Length; i++)
+                    {
+                        byte tmp1 = (byte)(bcompread[i / 4] >> ((2*i) % 8));
+                        byte tmp2 = (byte)(tmp1 & 3);
+                        bread1[i] = (byte)((bcompread[i / 4] >> ((2*i) % 8)) & 3);
+
+                        if (bread[i] != bread1[i]) throw new Exception("Err 3");
+                    }
+
 
                     // создадим или прочитаем кодированный рид
                     Code[] reed = null;
