@@ -5,29 +5,38 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 
+
 namespace DeBruijnTestGenerator
 {
     class Program
     {
         static void Main(string[] args)
         {
-            //TextWriter line_twriter = new StreamWriter(File.Open(@"C:\data\DeBruijn\line.txt", FileMode.Create, FileAccess.Write)); //файл со строкой
-            //TextWriter reads_twriter = new StreamWriter(File.Open(@"C:\data\DeBruijn\Gen_reads.txt", FileMode.Create, FileAccess.Write)); //файл с ридами
-            TextWriter line_twriter = new StreamWriter(File.Open(@"D:\Home\data\DeBruijn\line.txt", FileMode.Create, FileAccess.Write)); //файл со строкой
-            TextWriter reads_twriter = new StreamWriter(File.Open(@"D:\Home\data\DeBruijn\Gen_reads.txt", FileMode.Create, FileAccess.Write)); //файл с ридами
-            long size = 10_000_000; //размер исходной строки
-            int coverage = 10; // сколько раз полностью покрыть строку с помощью 100 символов
-            long reads_count = (size / 100) * coverage; //количество ридов в результате
+            TextWriter line_twriter = new StreamWriter(File.Open(@"D:\PROJECTS\DeBrein\hum_gen5.txt", FileMode.Create, FileAccess.Write)); //файл со строкой
+            TextWriter reads_twriter = new StreamWriter(File.Open(@"D:\PROJECTS\DeBrein\hum_gen_reads5.txt", FileMode.Create, FileAccess.Write)); //файл с ридами
+            //TextWriter line_twriter = new StreamWriter(File.Open(@"D:\Home\data\DeBruijn\line.txt", FileMode.Create, FileAccess.Write)); //файл со строкой
+            //TextWriter reads_twriter = new StreamWriter(File.Open(@"D:\Home\data\DeBruijn\Gen_reads.txt", FileMode.Create, FileAccess.Write)); //файл с ридами
+            long size = 3_200_000_000; //размер исходной строки
+            int readLength = 250; //длина рида
+            int coverage = 50; // сколько раз полностью покрыть строку с помощью readLength символов
+            long reads_count = (size / readLength) * coverage; //количество ридов в результате
             string chars = "ACGT";
-            char[] stringChars = new char[size];
+            long innerArrSize = 1000_000_000;
+            long outerArrSize = Convert.ToInt64(Math.Ceiling((double)size / innerArrSize));
+            char[][] stringChars = new char[outerArrSize][];
             Random random = new Random(777777777);
             Random rnd = new Random();
-
-            for (long i = 0; i < stringChars.Length; i++) //генерация файла строки
+            for (int j = 0; j < outerArrSize; j++) //генерация файла aстроки
             {
-                stringChars[i] = chars[random.Next(chars.Length)];
+                char[] innerArr = new char[innerArrSize];
+                for (long i = 0; i < innerArrSize; i++)
+                {
+                    innerArr[i] = chars[random.Next(chars.Length)];
+                }
+                stringChars[j] = innerArr;
+                line_twriter.WriteLine(innerArr);
             }
-            line_twriter.WriteLine(stringChars);
+            //line_twriter.WriteLine(stringChars);
             //var finalString = new String(stringChars);
 
             line_twriter.Close();
@@ -35,22 +44,32 @@ namespace DeBruijnTestGenerator
             long real_length = 0;
             for (int i = 0; i < reads_count; i++) //генерация файла с ридами
             {
-                long position = LongRandom(0, size, random);
-                if (position + 100 <= size)
+                long position = LongRandom(0, size - readLength + 1, random);
+                long position_x = position / innerArrSize;
+                long position_y = position % innerArrSize;
+                String read = "";
+                real_length++;
+                //Console.WriteLine(real_length);
+                long new_position_y = 0;
+                for (int j = 0; j < readLength; j++)
                 {
-                    String read = "";
-                    real_length++;
-                    for (int j = 0; j < 100; j++)
+                    if (position_y + j < innerArrSize)
                     {
-                        char nxtchr = stringChars[position + j];
+                        char nxtchr = stringChars[position_x][position_y + j];
                         // Имитация ошибки
                         //if (rnd.Next(1000) < 1) nxtchr = chars[random.Next(chars.Length)];
                         read += nxtchr;
                     }
-                    reads_twriter.WriteLine(read);
+                    else
+                    {
+                        char nxtchr = stringChars[position_x + 1][new_position_y];
+                        new_position_y++;
+                        read += nxtchr;
+                    }
                 }
+                reads_twriter.WriteLine(read);
 
-                
+
             }
             reads_twriter.Close();
             Console.WriteLine($"Successfuly generated! Reads generated: {real_length}");
