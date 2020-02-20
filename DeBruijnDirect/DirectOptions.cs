@@ -14,7 +14,7 @@ namespace DeBruijnDirect
 
         public static int nsymbols = 20;
         public static int npasses = 1;
-        public static int nsections = 1;
+        public static int nsections = 4;
 
     }
 }

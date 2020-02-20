@@ -9,7 +9,7 @@ namespace DeBruijnDirect
     {
         static void Main()
         {
-            Main1();
+            Main2();
         }
         static void Main1()
         {
