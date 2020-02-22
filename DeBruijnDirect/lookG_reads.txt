@@ -1,7 +1,0 @@
-Start DeBruijnDirect (Main2) version 1.2, passes: 1, sections: 1 K: 20
-Constructing graph: 
-0 
-reads: 1000000 words: 81000000 codes: 9996555
-# startpoins: 396
-maxchain: 181969
-Duration=18861
