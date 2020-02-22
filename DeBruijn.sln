@@ -15,7 +15,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestGenerator", "TestGenera
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DeBruijnHisto", "DeBruijnHisto\DeBruijnHisto.csproj", "{83553C2C-9E03-4C39-AA48-B286B17EE679}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReadsProcessing", "ReadsProcessing\ReadsProcessing.csproj", "{A4147DCC-C68A-44EE-9613-F2B6A95263E7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ReadsProcessing", "ReadsProcessing\ReadsProcessing.csproj", "{A4147DCC-C68A-44EE-9613-F2B6A95263E7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReadsGen", "ReadsGen\ReadsGen.csproj", "{8122E85E-6C79-42C7-BB61-636BFC0AF40C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -51,6 +53,10 @@ Global
 		{A4147DCC-C68A-44EE-9613-F2B6A95263E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A4147DCC-C68A-44EE-9613-F2B6A95263E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A4147DCC-C68A-44EE-9613-F2B6A95263E7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8122E85E-6C79-42C7-BB61-636BFC0AF40C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8122E85E-6C79-42C7-BB61-636BFC0AF40C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8122E85E-6C79-42C7-BB61-636BFC0AF40C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8122E85E-6C79-42C7-BB61-636BFC0AF40C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
