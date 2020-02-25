@@ -62,17 +62,15 @@ namespace DeBruijnHisto
                         {
                             bread[i] = (byte)((comp_breed[i >> 2] >> ((i & 3) << 1)) & 3);
                         }
-                        if (iread == 1499999)
-                        {
-                            Console.WriteLine($"ir={iread} ");
-                            for (int k = 0; k < bread.Length; k++)
-                            {
-                                Console.Write($"{bread[k]} ");
-                            }
-                            Console.WriteLine();
-                        }
-                        iread++;
-                        if (iread >= nreads) break;
+                        //if (iread == 1499999)
+                        //{
+                        //    Console.WriteLine($"ir={iread} ");
+                        //    for (int k = 0; k < bread.Length; k++)
+                        //    {
+                        //        Console.Write($"{bread[k]} ");
+                        //    }
+                        //    Console.WriteLine();
+                        //}
 
                     }
                     else
@@ -107,7 +105,7 @@ namespace DeBruijnHisto
                             bword = (bword << 2) | bread[i + j];
                         }
 
-                        if (iread == 1500000 && i == 0) Console.WriteLine("bword(0)=" + bword);
+                        //if (iread == 1500000 && i == 0) Console.WriteLine("bword(0)=" + bword);
 
                         // Работаем только со словами данного прохода
                         if ((int)(bword & (ulong)(HistoOptions.npasses - 1)) == ipass)
@@ -124,6 +122,8 @@ namespace DeBruijnHisto
                             }
                         }
                     }
+                    iread++;
+                    if (iread >= nreads) break;
                 }
                 // Фиксируем результат
                 numberofnodes += hdic.Count;
@@ -156,15 +156,15 @@ namespace DeBruijnHisto
                         //Word[] reed = null;
                         //reed = new Word[readlength - HistoOptions.nsymbols + 1];
 
-                        if (ir == 1499999)
-                        {
-                            Console.WriteLine($"iread={ir}");
-                            for (int k = 0; k < bread.Length; k++)
-                            {
-                                Console.Write($"{bread[k]} ");
-                            }
-                            Console.WriteLine();
-                        }
+                        //if (ir == 1499999)
+                        //{
+                        //    Console.WriteLine($"iread={ir}");
+                        //    for (int k = 0; k < bread.Length; k++)
+                        //    {
+                        //        Console.Write($"{bread[k]} ");
+                        //    }
+                        //    Console.WriteLine();
+                        //}
 
 
                         if (single[ir] == null) 
@@ -195,7 +195,7 @@ namespace DeBruijnHisto
                                 }
                                 else
                                 {
-                                    Console.WriteLine($"ir={ir} i={i}");
+                                    Console.WriteLine($"Err in: ir={ir} i={i}");
                                     for (int k = 0; k < bread.Length; k++)
                                     {
                                         Console.Write($"{bread[k]} ");
