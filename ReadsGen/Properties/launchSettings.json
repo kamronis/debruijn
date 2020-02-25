@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "ReadsGen": {
+      "commandName": "Project",
+      "commandLineArgs": "D:\\Home\\data\\deBruijn\\G_reads.bin 1000000 100 30 0,01"
+    }
+  }
+}

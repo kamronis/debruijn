@@ -9,8 +9,8 @@ namespace ReadsProcessing
         static void Main(string[] args)
         {
             Console.WriteLine("Start Reads Processing!");
-            FileStream filereads = File.Open(@"D:\Home\data\DeBruijn\Gen_reads.txt", FileMode.Open, FileAccess.Read);
-            //FileStream filereads = File.Open(@"D:\Home\data\DeBruijn\reads.txt", FileMode.Open, FileAccess.Read);
+            //FileStream filereads = File.Open(@"D:\Home\data\DeBruijn\Gen_reads.txt", FileMode.Open, FileAccess.Read);
+            FileStream filereads = File.Open(@"D:\Home\data\DeBruijn\reads.txt", FileMode.Open, FileAccess.Read);
             TextReader reader = new StreamReader(filereads);
 
             // Сделаем байт-нарный файл ридов, его структура [[byte]] и бинарные ридер и райтер к нему

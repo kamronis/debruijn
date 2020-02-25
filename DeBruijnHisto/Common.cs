@@ -7,10 +7,10 @@ namespace DeBruijnHisto
     class Common
     {
     }
-    struct Word
-    {
-        public ulong wd;
-    }
+    //struct Word
+    //{
+    //    public ulong wd;
+    //}
     class HistoInfo
     {
         public int count = 0;

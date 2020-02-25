@@ -11,13 +11,17 @@ namespace ReadsGen
             string fileout;
             long chainlength;
             int readlength, multiplicity;
-            if (args.Length != 4)
+            double p = 0.0001;
+            Random rand = new Random();
+
+            if (args.Length != 5)
             {
-                Console.WriteLine("usage: ReadsGen fileout chainlength readlength multiplicity");
+                Console.WriteLine("usage: ReadsGen fileout chainlength readlength multiplicity probability");
                 fileout = @"D:\Home\data\deBruijn\G_reads.bin";
-                chainlength = 100_000_000;
+                chainlength = 10_000_000;
                 readlength = 100;
-                multiplicity = 10;
+                multiplicity = 30;
+                p = 0.001;
             }
             else
             {
@@ -25,8 +29,10 @@ namespace ReadsGen
                 chainlength = Int64.Parse(args[1]);
                 readlength = Int32.Parse(args[2]);
                 multiplicity = Int32.Parse(args[3]);
+                Console.WriteLine(args[4]);
+                p = Double.Parse(args[4]);
             }
-            Console.Write($"Start ReadsGen: {fileout} {chainlength} {readlength} {multiplicity}");
+            Console.Write($"Start ReadsGen: {fileout} {chainlength} {readlength} {multiplicity} {p}");
 
             // Формирование цепочки символов, символы 0-3 упаковываются в байты. Это позволяет иметь цепочку до 8 млрд. символов
             int byteslength = (int)((chainlength / 4) + 1);
@@ -66,7 +72,8 @@ namespace ReadsGen
                 {
                     int symb = ((int)bytes[chainposition >> 2] >> ((int)(chainposition & 3) << 1)) & 3;
                     chainposition++;
-                    comp_breed[i >> 2] = (byte)(comp_breed[i >> 2] | (symb << ((i & 3) << 1)));
+                    int nsymb = rand.NextDouble() < p ? rnd.Next(4) : (symb << ((i & 3) << 1)); 
+                    comp_breed[i >> 2] = (byte)(comp_breed[i >> 2] | nsymb);
                 }
                 // Записываем массив байтов
                 bw.Write(comp_breed);
