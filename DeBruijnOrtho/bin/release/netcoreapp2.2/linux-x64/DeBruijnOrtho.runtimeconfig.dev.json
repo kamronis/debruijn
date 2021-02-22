@@ -1,0 +1,8 @@
+{
+  "runtimeOptions": {
+    "additionalProbingPaths": [
+      "C:\\Users\\Kamroni\\.dotnet\\store\\|arch|\\|tfm|",
+      "C:\\Users\\Kamroni\\.nuget\\packages"
+    ]
+  }
+}
